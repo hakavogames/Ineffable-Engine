@@ -1,0 +1,23 @@
+<tileset>
+	<tiledata filename="tilesets/tile2.png" tilesize="24" />
+	<tile x="0" y="0">
+		<name>grass</name>
+		<collide>false</collide>
+	</tile>
+	<tile x="1" y="0">
+		<name>logs</name>
+		<collide>true</collide>
+	</tile>
+	<tile x="0" y="1">
+		<name>logs_left</name>
+		<collide>true</collide>
+	</tile>
+	<tile x="1" y="1">
+		<name>logs_center</name>
+		<collide>true</collide>
+	</tile>
+	<tile x="2" y="1">
+		<name>logs_right</name>
+		<collide>true</collide>
+	</tile>
+</tileset>
