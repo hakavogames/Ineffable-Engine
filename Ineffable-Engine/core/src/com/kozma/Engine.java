@@ -16,7 +16,7 @@ public class Engine {
     public void init() {
         GameServices.init();
         camera=new OrthographicCamera();
-        camera.setToOrtho(false,Gdx.graphics.getWidth()/6,Gdx.graphics.getHeight()/6);
+        camera.setToOrtho(false,Gdx.graphics.getWidth()/5,Gdx.graphics.getHeight()/5);
         ui=new OrthographicCamera();
         ui.setToOrtho(false,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         gameMode.init(this);
@@ -47,7 +47,8 @@ public class Engine {
         GameServices.spriteBatch.setShader(GameServices.getDefaultShader());
         
         for(Renderable renderable : renderList)
-            renderable.render(camera);
+            if(renderable.visible)
+                renderable.render(camera);
         
         GameServices.spriteBatch.end();
         gameMode.render(ui);

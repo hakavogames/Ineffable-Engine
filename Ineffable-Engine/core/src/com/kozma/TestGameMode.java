@@ -7,6 +7,9 @@ import com.badlogic.gdx.math.*;
 import com.kozma.core.*;
 import com.kozma.core.ParticleSystem.Particle;
 import com.kozma.gameobjects.*;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TestGameMode implements GameMode {
     Map map;
@@ -25,7 +28,7 @@ public class TestGameMode implements GameMode {
         GameObject background=new GameObject();
         background.addComponent(new Transform());
         background.addComponent(new TiledBackground(wall));
-        background.getComponent(Transform.class).scale.set(1.5f,1.5f);
+        background.getComponent(Transform.class).scale.set(1,1);
         
         Tileset poses=new Tileset(Gdx.files.internal("Scavengers_SpriteSheet.png"),32);
         Sprite2D sprite=new Sprite2D();
@@ -66,12 +69,33 @@ public class TestGameMode implements GameMode {
         
         fire.addComponent(ps);
         
-        background.getComponent(TiledBackground.class).layer=2;
-        ps.layer=0;
-        player.getComponent(SpriteRenderer.class).layer=1;
-        engine.level.addGameObject(background);
+        player.getComponent(SpriteRenderer.class).visible=false;
+        background.getComponent(TiledBackground.class).layer=3;
+        background.getComponent(Transform.class).position.set(0,32);
+        ps.layer=1;
+        player.getComponent(SpriteRenderer.class).layer=2;
+        //engine.level.addGameObject(background);
         engine.level.addGameObject(player);
         engine.level.addGameObject(fire);
+        
+        Sprite2D l1=new Sprite2D(new TextureRegion(new Texture(Gdx.files.internal("parallax/bg.png"))));
+        Sprite2D l2=new Sprite2D(new TextureRegion(new Texture(Gdx.files.internal("parallax/far-buildings.png"))));
+        Sprite2D l3=new Sprite2D(new TextureRegion(new Texture(Gdx.files.internal("parallax/buildings.png"))));
+        Sprite2D l4=new Sprite2D(new TextureRegion(new Texture(Gdx.files.internal("parallax/foreground.png"))));
+        ParallaxScroller p1=new ParallaxScroller(l1,0);
+        ParallaxScroller p2=new ParallaxScroller(l2,0.4f);
+        ParallaxScroller p3=new ParallaxScroller(l3,0.7f);
+        ParallaxScroller p4=new ParallaxScroller(l4,1f);
+        p1.layer=7;
+        p2.layer=6; 
+        p3.layer=5;
+        p4.layer=4;
+        GameObject bg=new GameObject();
+        bg.name="background";
+        bg.addComponents(new Transform(),p1,p2,p3,p4);
+        bg.getComponent(Transform.class).scale.set(1,1);
+        
+        engine.level.addGameObject(bg);
         animation.play();
     }
     @Override

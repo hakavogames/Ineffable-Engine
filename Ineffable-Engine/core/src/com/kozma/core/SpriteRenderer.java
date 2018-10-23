@@ -38,6 +38,5 @@ public class SpriteRenderer extends Renderable
                         tr.getRegionWidth()*transform.scale.x,tr.getRegionHeight()*transform.scale.y,
                         tr.getRegionX(),tr.getRegionY(),tr.getRegionWidth(),tr.getRegionHeight(),flipX,flipY);
         }
-        sb.flush();
     }
 }

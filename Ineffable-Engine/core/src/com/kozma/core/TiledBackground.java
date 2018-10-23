@@ -30,17 +30,18 @@ public class TiledBackground extends Renderable
             float width=sprite.textureRegion.getRegionWidth();
             float height=sprite.textureRegion.getRegionHeight();
             float scaleX=1,scaleY=1;
+            float posx=cam.position.x;
+            float posy=cam.position.y;
             if(transform!=null)
             {
                 scaleX*=transform.scale.x;
                 scaleY*=transform.scale.y;
+                posx+=transform.position.x;
+                posy+=transform.position.y;
             }
             
             float viewportWidth=cam.viewportWidth*cam.zoom;
             float viewportHeight=cam.viewportHeight*cam.zoom;
-            
-            float posx=cam.position.x;
-            float posy=cam.position.y;
             
             int minx=(int)(posx/width/scaleX-viewportWidth/2/width/scaleX);
             int maxx=(int)(posx/width/scaleX+viewportWidth/2/width/scaleX);
@@ -51,6 +52,5 @@ public class TiledBackground extends Renderable
                 for(int y=miny-1;y<=maxy;y++)
                     sb.draw(sprite.textureRegion,x*width*scaleX,y*height*scaleY,0,0,width,height,scaleX,scaleY,0);
         }
-        sb.flush();
     }
 }

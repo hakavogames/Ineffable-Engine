@@ -49,7 +49,6 @@ public class ParticleSystem extends Renderable {
                     tr.getRegionWidth()*scaleX,tr.getRegionHeight()*scaleY,
                     tr.getRegionX(),tr.getRegionY(),tr.getRegionWidth(),tr.getRegionHeight(),false,false);
         }
-        sb.flush();
     }
     
     public static class Particle {

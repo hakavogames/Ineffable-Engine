@@ -91,7 +91,6 @@ public class Map extends GameObject {
                                     tileset.tilesize,tileset.tilesize);
                         }
             }
-            sb.flush();
         }
         @Override
         public void update(float delta) {

@@ -62,6 +62,11 @@ public class GameObject
         this.components.add(component);
         component.setGameObject(this);
     }
+    public final void addComponents(GameComponent... components)
+    {
+        for(GameComponent gameComponent : components)
+            addComponent(gameComponent);
+    }
     
     public void start()
     {
@@ -77,6 +82,9 @@ public class GameObject
     {
         Array<Renderable> array=getComponents(Renderable.class);
         for(int i=0;i<array.size;i++)
-            array.get(i).render(camera);
+        {
+            if(array.get(i).visible==true)
+                array.get(i).render(camera);
+        }
     }
 }
