@@ -23,11 +23,19 @@ import com.kozma.core.*;
 import com.kozma.gameobjects.*;
 import java.util.Comparator;
 
+/**
+ * The Engine object is used to have all the functionality of the Ineffable Engine.
+ * @author HakavoGames
+ */
+
 public class Engine {
     protected Joint level=new Joint();
     public OrthographicCamera camera;
     protected GameMode gameMode;
     private OrthographicCamera ui;
+    /**
+     * Initialize the engine. Use it in the create() method of your main LibGDX game class.
+     */
     public void init() {
         GameServices.init();
         camera=new OrthographicCamera();
@@ -40,11 +48,18 @@ public class Engine {
         Gdx.gl.glDisable(GL30.GL_DEPTH_TEST);
         ShaderProgram.pedantic=false;
     }
+    /**
+     * Use this method to assign this Engine object to another gameMode.
+     * @param gameMode The new GameMode you assign this Engine object to.
+     */
     public void setGamemode(GameMode gameMode)
     {
         this.gameMode=gameMode;
     }
     private Array<Renderable> renderList=new Array<Renderable>();
+    /**
+     * Use this function to render everything in the render() method of your LibGDX game.
+     */
     public void render()
     {
         renderList.clear();
@@ -68,6 +83,10 @@ public class Engine {
         GameServices.spriteBatch.end();
         gameMode.render(ui);
     }
+    /**
+     * 
+     * @param delta The deltaTime of the game.
+     */
     public void update(float delta)
     {
         level.update(delta);

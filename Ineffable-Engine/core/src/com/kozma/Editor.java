@@ -27,7 +27,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import java.util.Random;
-
+/**
+ * 
+ * @author HakavoGames
+ */
 public class Editor implements GameMode,InputProcessor {
     Tileset tileset;
     Map map;

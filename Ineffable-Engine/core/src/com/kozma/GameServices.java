@@ -21,12 +21,18 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.*;
 import java.util.Random;
-
+/**
+ * The GameServices class contains main objects such as the spriteBatch ShaderProgram and more.
+ * @author HakavoGames
+ */
 public class GameServices {
     protected static SpriteBatch spriteBatch;
     protected static ShaderProgram defaultShader;
     private static long startTime;
     
+    /**
+     * Initialize the GameServices. Automatically called in the init() method of the Engine class.
+     */
     public static void init()
     {
         MathUtils.random=new Random();
@@ -36,12 +42,21 @@ public class GameServices {
         if(!defaultShader.isCompiled())
             throw new GdxRuntimeException(defaultShader.getLog());
     }
+    /**
+     * @return The SpriteBatch.
+     */
     public static SpriteBatch getSpriteBatch() {
         return spriteBatch;
     }
+    /**
+     * @return The ShaderProgram.
+     */
     public static ShaderProgram getDefaultShader() {
         return defaultShader;
     }
+    /**
+     * @return The elapsed time since the startup of the game.
+     */
     public static float getElapsedTime()
     {
         return TimeUtils.timeSinceMillis(startTime)/1000f;

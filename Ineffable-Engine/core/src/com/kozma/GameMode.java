@@ -19,6 +19,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public interface GameMode
 {
+    /**
+     * 
+     * @param engine 
+     */
     public void init(Engine engine);
     public void update(float delta);
     public void render(OrthographicCamera camera);

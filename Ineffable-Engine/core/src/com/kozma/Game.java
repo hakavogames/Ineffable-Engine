@@ -15,7 +15,7 @@ public class Game extends ApplicationAdapter {
     public void create()
     {
         sb=new SpriteBatch();
-        engine.gameMode=new TestGameMode();
+        engine.gameMode=new TestGameMode(); //replace TestGameMode() with your GameMode class.
         engine.init();
     }
     @Override
