@@ -33,7 +33,7 @@ public class Engine {
     public void init() {
         GameServices.init();
         camera=new OrthographicCamera();
-        camera.setToOrtho(false,Gdx.graphics.getWidth()/1,Gdx.graphics.getHeight()/1);
+        camera.setToOrtho(false,Gdx.graphics.getWidth()/4,Gdx.graphics.getHeight()/4);
         ui=new OrthographicCamera();
         ui.setToOrtho(false,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         gameMode.init(this);

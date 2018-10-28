@@ -94,18 +94,21 @@ public class Joint extends GameObject
     @Override
     public void start()
     {
+        super.start();
         for(int i=0;i<gameObjects.size;i++)
             gameObjects.get(i).start();
     }
     @Override
     public void update(float delta)
     {
+        super.update(delta);
         for(int i=0;i<gameObjects.size;i++)
             gameObjects.get(i).update(delta);
     }
     @Override
     public void render(OrthographicCamera camera)
     {
+        super.render(camera);
         for(int i=0;i<gameObjects.size;i++)
             gameObjects.get(i).render(camera);
     }

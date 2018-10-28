@@ -15,12 +15,12 @@
  */
 
 package com.hakavo.core;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.utils.*;
 
 public class GameObject
 {
+    private boolean initialized=false;
     public String name="default";
     public final Array<GameComponent> components=new Array<GameComponent>();
     
@@ -85,8 +85,12 @@ public class GameObject
     
     public void start()
     {
-        for(int i=0;i<components.size;i++)
-            components.get(i).start();
+        if(!initialized)
+        {
+            initialized=true;
+            for(int i=0;i<components.size;i++)
+                components.get(i).start();
+        }
     }
     public void update(float delta)
     {
@@ -101,5 +105,8 @@ public class GameObject
             if(array.get(i).visible==true)
                 array.get(i).render(camera);
         }
+    }
+    public final boolean isInitialized() {
+        return initialized;
     }
 }

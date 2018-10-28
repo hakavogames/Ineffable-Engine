@@ -48,11 +48,13 @@ public class TiledBackground extends Renderable
             float width=sprite.textureRegion.getRegionWidth();
             float height=sprite.textureRegion.getRegionHeight();
             Vector2 pos=Pools.obtain(Vector2.class),scale=Pools.obtain(Vector2.class).set(1,1);
+            Matrix3 matrix=Pools.obtain(Matrix3.class).idt();
             if(transform!=null)
             {
+                transform.calculateMatrix(matrix);
                 Vector2 foo=Pools.obtain(Vector2.class);
-                pos.set(transform.matrix.getTranslation(foo));
-                scale.set(transform.matrix.getScale(foo));
+                pos.set(matrix.getTranslation(foo));
+                scale.set(matrix.getScale(foo));
             }
             
             float viewportWidth=cam.viewportWidth*cam.zoom;
@@ -66,6 +68,7 @@ public class TiledBackground extends Renderable
             for(int x=minx-1;x<=maxx;x++)
                 for(int y=miny-1;y<=maxy;y++)
                     sb.draw(sprite.textureRegion,x*width*scale.x,y*height*scale.y,0,0,width,height,scale.x,scale.y,0);
+            Pools.free(matrix);
         }
     }
 }

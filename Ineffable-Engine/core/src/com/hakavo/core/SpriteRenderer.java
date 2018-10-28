@@ -46,9 +46,9 @@ public class SpriteRenderer extends Renderable
         if(sprite!=null)
         {
             Matrix3 mat=Pools.obtain(Matrix3.class).idt();
-            if(transform!=null)mat.set(transform.matrix);
+            if(transform!=null)transform.calculateMatrix(mat);
+            
             Matrix4 foo=Pools.obtain(Matrix4.class).set(mat);
-            foo=new Matrix4().set(mat);
             
             TextureRegion tr=sprite.textureRegion;
             sb.setTransformMatrix(foo);
@@ -57,7 +57,7 @@ public class SpriteRenderer extends Renderable
                     tr.getRegionX(),tr.getRegionY(),tr.getRegionWidth(),tr.getRegionHeight(),flipX,flipY);
             
             Pools.free(mat);
-            //Pools.free(foo);
+            Pools.free(foo);
         }
     }
 }

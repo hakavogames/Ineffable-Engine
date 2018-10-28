@@ -20,8 +20,7 @@ import com.hakavo.GameServices;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Pools;
 
 public class ParallaxScroller extends Renderable
@@ -69,11 +68,13 @@ public class ParallaxScroller extends Renderable
             //float posx=cam.position.x,posy=cam.position.y;
             Vector2 pos=Pools.obtain(Vector2.class).set(cam.position.x,cam.position.y);
             Vector2 scale=Pools.obtain(Vector2.class).set(1,1);
+            Matrix3 matrix=Pools.obtain(Matrix3.class).idt();
             if(transform!=null)
             {
+                transform.calculateMatrix(matrix);
                 Vector2 foo=Pools.obtain(Vector2.class);
-                scale.scl(transform.matrix.getScale(foo));
-                pos.add(transform.matrix.getTranslation(foo));
+                scale.scl(matrix.getScale(foo));
+                pos.add(matrix.getTranslation(foo));
                 width*=scale.x;
                 height*=scale.y;
                 Pools.free(foo);
@@ -103,6 +104,7 @@ public class ParallaxScroller extends Renderable
             Pools.free(pos);
             Pools.free(scale);
             Pools.free(foo);
+            Pools.free(matrix);
         }
     }
 }

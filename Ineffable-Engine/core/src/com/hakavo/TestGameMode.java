@@ -15,18 +15,8 @@
  */
 
 package com.hakavo;
-import com.hakavo.gameobjects.Map;
-import com.hakavo.core.ParallaxScroller;
-import com.hakavo.core.Transform;
-import com.hakavo.core.Sprite2D;
-import com.hakavo.core.TiledBackground;
-import com.hakavo.core.GameComponent;
-import com.hakavo.core.ParticleSystem;
-import com.hakavo.core.TextRenderer;
-import com.hakavo.core.Animation;
-import com.hakavo.core.SpriteRenderer;
-import com.hakavo.core.AnimationClip;
-import com.hakavo.core.GameObject;
+import com.hakavo.gameobjects.*;
+import com.hakavo.core.*;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.*;
@@ -35,8 +25,7 @@ import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Pools;
 import com.hakavo.core.ParticleSystem.Particle;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 public class TestGameMode implements GameMode {
     Map map;
@@ -60,61 +49,35 @@ public class TestGameMode implements GameMode {
         Tileset poses=new Tileset(Gdx.files.internal("Scavengers_SpriteSheet.png"),32);
         Sprite2D sprite=new Sprite2D();
         
-        AnimationClip clip=new AnimationClip();
-        for(int i=0;i<6;i++)clip.frames.add(poses.tiles.get(i).createTextureRegion());
-        clip.duration=1f;
-        clip.loop=true;
-        Animation animation=new Animation();
-        animation.setTarget(sprite);
-        animation.clip=clip;
-        animation.name="idle";
+        AnimationClip clip1=new AnimationClip();
+        for(int i=0;i<6;i++)clip1.frames.add(poses.tiles.get(i).createTextureRegion());
+        clip1.duration=1f;
+        clip1.loop=true;
         
-        GameObject player=new GameObject();
+        AnimationClip clip2=new AnimationClip();
+        for(int i=46;i<48;i++)clip2.frames.add(poses.tiles.get(i).createTextureRegion());
+        clip2.duration=0.6f;
+        clip2.loop=true;
+        
+        Animation idle=new Animation("idle",clip1);
+        Animation fart=new Animation("fart",clip2);
+        AnimationController animationController=new AnimationController(sprite,idle,fart);
+        
+        Sprite2D fireSprite=new Sprite2D(new TextureRegion(new Texture(Gdx.files.internal("fire.png"))));
+        Joint player=new Joint();
         player.name="player";
         player.addComponent(new Transform());
         player.addComponent(new SpriteRenderer(sprite));
-        player.addComponent(animation);
+        player.addComponent(animationController);
         player.addComponent(new PlayerController());
-        player.getComponent(SpriteRenderer.class).visible=true;
-        
-        Sprite2D fireSprite=new Sprite2D(new TextureRegion(new Texture(Gdx.files.internal("fire.png"))));
-        GameObject fire=new GameObject();
-        fire.name="fire";
-        fire.addComponent(new Transform(0,0,4,4));
-        fire.addComponent(new TextRenderer("gelu"));
-        ParticleSystem ps=new ParticleSystem(fireSprite);
-        fire.getComponent(TextRenderer.class).layer=1;
-        ps.enableBlending=true;
-        
-        fire.addComponent(ps);
-        fire.addComponent(new GameComponent() {
-            private ParticleSystem ps;
-            @Override
-            public void start() {
-                ps=this.getGameObject().getComponent(ParticleSystem.class);
-            }
-            @Override
-            public void update(float delta) {
-                float speed=100;
-                if(ps.particles.size<500)
-                {
-                    float x=MathUtils.random(-10,10);
-                    float y=MathUtils.random(5,10);
-                    Vector2 dir=new Vector2(x,y).nor();
-                    ps.particles.add(new Particle(MathUtils.random(-50,50),MathUtils.random(-50,50),0.1f,0.1f,
-                                                  dir.x*speed*MathUtils.random(0.5f,3f),dir.y*speed*MathUtils.random(0.5f,3f),
-                                                  2f*MathUtils.random(0.5f,1.5f),2));
-                }
-            }
-        });
+        player.addComponent(new ParticleSystem(fireSprite));
         
         background.getComponent(TiledBackground.class).layer=3;
         background.getComponent(Transform.class).matrix.translate(0,32);
-        ps.layer=1;
         player.getComponent(SpriteRenderer.class).layer=2;
         //engine.level.addGameObject(background);
         engine.level.addGameObject(player);
-        engine.level.addGameObject(fire);
+        //engine.level.addGameObject(fire);
         
         Sprite2D l1=new Sprite2D(new TextureRegion(new Texture(Gdx.files.internal("parallax/mountain/trees1.png"))));
         Sprite2D l2=new Sprite2D(new TextureRegion(new Texture(Gdx.files.internal("parallax/mountain/trees2.png"))));
@@ -124,9 +87,9 @@ public class TestGameMode implements GameMode {
         Sprite2D l6=new Sprite2D(new TextureRegion(new Texture(Gdx.files.internal("parallax/mountain/background.png"))));
         ParallaxScroller p1=new ParallaxScroller(l1,1);
         ParallaxScroller p2=new ParallaxScroller(l2,0.75f);
-        ParallaxScroller p3=new ParallaxScroller(l3,0.6f);
-        ParallaxScroller p4=new ParallaxScroller(l4,0.25f);
-        ParallaxScroller p5=new ParallaxScroller(l5,0.1f);
+        ParallaxScroller p3=new ParallaxScroller(l3,0.4f);
+        ParallaxScroller p4=new ParallaxScroller(l4,0.15f);
+        ParallaxScroller p5=new ParallaxScroller(l5,0.05f);
         ParallaxScroller p6=new ParallaxScroller(l6,0f);
         p1.layer=5;
         p2.layer=6;
@@ -136,10 +99,9 @@ public class TestGameMode implements GameMode {
         p6.layer=10;
         GameObject bg=new GameObject();
         bg.name="background";
-        bg.addComponents(new Transform(0,0,1,1f),p1,p2,p3,p4,p5,p6);
+        bg.addComponents(new Transform(0,0,0.4f,0.4f),p1,p2,p3,p4,p5,p6);
         
         engine.level.addGameObject(bg);
-        animation.play();
     }
     @Override
     public void update(float delta) {
@@ -158,13 +120,27 @@ public class TestGameMode implements GameMode {
         public float speed=50;
         private Transform transform;
         private SpriteRenderer spriteRenderer;
+        private GameObject tag;
+        private ParticleSystem particleSystem;
+        private AnimationController animationController;
         @Override
         public void start() {
             this.transform=super.getGameObject().getComponent(Transform.class);
             this.spriteRenderer=super.getGameObject().getComponent(SpriteRenderer.class);
+            this.particleSystem=super.getGameObject().getComponent(ParticleSystem.class);
+            this.animationController=super.getGameObject().getComponent(AnimationController.class);
+            
+            animationController.play("idle");
+            tag=new GameObject();
+            tag.addComponent(new Transform(0,40,0.25f,0.25f).setRelative(this.transform));
+            tag.addComponent(new TextRenderer("Press F to fart"));
+            particleSystem.isTransformDependent=false;
+            ((Joint)this.gameObject).addGameObject(tag);
         }
         @Override
         public void update(float delta) {
+            tag.getComponent(Transform.class).matrix.rotate(50*delta);
+            
             if(Gdx.input.isKeyPressed(Keys.A))
             {
                 spriteRenderer.flipX=true;
@@ -175,10 +151,30 @@ public class TestGameMode implements GameMode {
                 spriteRenderer.flipX=false;
                 transform.matrix.translate(speed*delta,0);
             }
-            Vector2 position=Pools.obtain(Vector2.class);
-            transform.matrix.getTranslation(position);
-            transform.matrix.setToTranslation(MathUtils.round(position.x),MathUtils.round(position.y));
-            Pools.free(position);
+            if(Gdx.input.isKeyPressed(Keys.F))
+            {
+                if(!animationController.getAnimationByName("fart").isPlaying())
+                    animationController.play("fart");
+                float speed=100;
+                if(particleSystem.particles.size<500)
+                {
+                    Vector2 playerPos=Pools.obtain(Vector2.class);
+                    transform.matrix.getTranslation(playerPos);
+                    
+                    float x=MathUtils.random(-10,-7);
+                    float y=MathUtils.random(-2,2);
+                    Vector2 dir=new Vector2(x,y).nor().scl(0.4f);
+                    particleSystem.particles.add(new Particle(MathUtils.random(-40,-20)+playerPos.x,MathUtils.random(-15,-10)+playerPos.y,
+                                                              0.15f,0.15f,
+                                                              dir.x*speed*MathUtils.random(1.5f,3f),dir.y*speed*MathUtils.random(1.5f,3f),
+                                                              2f*MathUtils.random(0.5f,1.5f),2));
+                    
+                    Pools.free(playerPos);
+                }
+            }
+            else if(!animationController.getAnimationByName("idle").isPlaying())
+                animationController.play("idle");
+            
         }
     }
 }

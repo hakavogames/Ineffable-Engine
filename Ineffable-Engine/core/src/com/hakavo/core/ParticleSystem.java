@@ -26,7 +26,8 @@ import com.hakavo.GameServices;
 public class ParticleSystem extends Renderable {
     public Sprite2D sprite;
     public Array<Particle> particles=new Array<Particle>();
-    public boolean enableBlending=false;
+    public boolean enableBlending=true;
+    public boolean isTransformDependent=true;
     
     private Transform transform;
     
@@ -55,21 +56,17 @@ public class ParticleSystem extends Renderable {
         SpriteBatch sb=GameServices.getSpriteBatch();
         for(Particle particle : particles)
         {
-            /*float scaleX=transform.scale.x*particle.scale.x,scaleY=transform.scale.y*particle.scale.y;
-            float posX=(transform.position.x+particle.position.x)*scaleX;
-            float posY=(transform.position.y+particle.position.y)*scaleY;*/
             TextureRegion tr=sprite.textureRegion;
             
             if(enableBlending)
                 sb.setColor(particle.color.r,particle.color.g,particle.color.b,
                             particle.color.a*(1f-(float)Math.pow((particle.lifetime/particle.lifespan),particle.decayExponent)));
             
-            /*sb.draw(tr.getTexture(),posX,posY,
-                    tr.getRegionWidth()*scaleX,tr.getRegionHeight()*scaleY,
-                    tr.getRegionX(),tr.getRegionY(),tr.getRegionWidth(),tr.getRegionHeight(),false,false);*/
             Matrix3 mat=Pools.obtain(Matrix3.class);
             Matrix4 mat4=Pools.obtain(Matrix4.class);
-            mat.set(transform.matrix).scale(particle.scale).translate(particle.position);
+            mat.idt();
+            if(isTransformDependent)transform.calculateMatrix(mat);
+            mat.translate(particle.position).scale(particle.scale);
             sb.setTransformMatrix(mat4.set(mat));
             sb.draw(tr,tr.getRegionWidth(),tr.getRegionHeight());
             Pools.free(mat);

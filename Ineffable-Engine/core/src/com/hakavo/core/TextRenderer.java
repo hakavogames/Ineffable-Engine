@@ -19,7 +19,7 @@ package com.hakavo.core;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Pools;
 import com.hakavo.GameServices;
 
@@ -47,13 +47,16 @@ public class TextRenderer extends Renderable {
     }
     @Override
     public void render(OrthographicCamera camera) {
-        Matrix4 foo=Pools.obtain(Matrix4.class).set(transform.matrix);
+        Matrix4 foo=Pools.obtain(Matrix4.class);
+        Matrix3 bar=transform.calculateMatrix(Pools.obtain(Matrix3.class));
+        foo.set(bar);
         
         GameServices.getSpriteBatch().setTransformMatrix(foo);
         font.setColor(color);
         font.draw(GameServices.getSpriteBatch(),text,0,0);
         
         Pools.free(foo);
+        Pools.free(bar);
     }
     @Override
     public void update(float delta) {

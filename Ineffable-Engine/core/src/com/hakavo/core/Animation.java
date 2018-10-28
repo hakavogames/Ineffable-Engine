@@ -16,7 +16,6 @@
 
 package com.hakavo.core;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.hakavo.GameServices;
 
 public class Animation extends GameComponent
@@ -26,9 +25,19 @@ public class Animation extends GameComponent
     private float currentTime,startTime;
     private boolean playing=false;
     
+    public Animation(String name,AnimationClip animationClip,Sprite2D target) {
+        super.name=name;
+        this.clip=animationClip;
+        setTarget(target);
+    }
+    public Animation(String name,AnimationClip animationClip) {
+        this(name,animationClip,null);
+    }
+    public Animation(Sprite2D target) {
+        this("defaultAnimation",null,target);
+    }
     public Animation() {
-        super.name="Animation";
-        clip=new AnimationClip();
+        this(null);
     }
     @Override
     public void update(float delta) {
