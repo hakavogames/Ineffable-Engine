@@ -30,6 +30,7 @@ import com.hakavo.core.AnimationController;
 import com.hakavo.core.GameObject;
 import com.hakavo.core.Joint;
 import com.hakavo.core.ParallaxScroller;
+import com.hakavo.core.ParticleSystem;
 import com.hakavo.core.Sprite2D;
 import com.hakavo.core.SpriteRenderer;
 import com.hakavo.core.Transform;
@@ -303,6 +304,7 @@ public class ExampleGameMode implements GameMode {
         scrolling which should be between 0f and 1f where 1 will be for the near background and 0 for the further one.
         
         You can also give 2 more arguments for which axis to do the scrolling on: x or y which are boolean values
+        NOTE THAT SCROLLING ON THE Y AXIS IS NOT SUPPORTED YET.
         
         Now I will also make the other ParallaxScrollers
         */
@@ -340,6 +342,26 @@ public class ExampleGameMode implements GameMode {
         engine.level.addGameObject(bg);
         /*
         If we run it we can see that the background is there and if we move it gives the ParallaxScrolling effect!
+        
+        We've looked on how to make a background with ParallaxScrolling, a player and how to make the camera follow it so
+        now it's time to look at ParticleSystems
+        
+        A ParticleSystem contains multiple Particles that are rendered and always face the camera. When we are doing
+        2D we don't need to worry about facing the camera because any sprite will always face the camera
+        
+        To create a ParticleSystem we first need a Sprite that the ParticleSystem will have
+        */
+        Sprite2D fire_sprite = new Sprite2D(new TextureRegion(new Texture(Gdx.files.internal("fire.png"))));
+        /*
+        Now we can define the ParticleSystem
+        */
+        ParticleSystem fire = new ParticleSystem(fire_sprite);
+        /*
+        After that we have to pass the ParticleSystem to the Engine
+        */
+        engine.level.addComponent(fire);
+        /*
+        Now that we've added it to the level Joint we can go to upgrade to make the behaviour of the particles
         */
         
     }
@@ -398,6 +420,10 @@ public class ExampleGameMode implements GameMode {
         Now, if we run the code we can see that the camera follows the player wherever it goes
         altough it's hard to see because we have a black background. Go back in init() to where
         you left to see how to add a background!
+        
+        
+        
+        RIGHT NOW I HAVEN'T FINISHED THE PARTICLESYSTEM TUTORIAL. PLEASE WAIT UNTIL IT IS FINISHED.
         */
     }
 
