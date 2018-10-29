@@ -108,6 +108,8 @@ public class Map extends GameObject {
                         }
             }
         }
+        public void onGui(OrthographicCamera gui) {
+        }
         @Override
         public void update(float delta) {
         }

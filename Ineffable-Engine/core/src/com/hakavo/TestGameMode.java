@@ -20,6 +20,8 @@ import com.hakavo.core.*;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Pools;
@@ -71,6 +73,7 @@ public class TestGameMode implements GameMode {
         player.addComponent(animationController);
         player.addComponent(new PlayerController());
         player.addComponent(new ParticleSystem(fireSprite));
+        player.addComponent(new ScoreController());
         
         background.getComponent(TiledBackground.class).layer=3;
         background.getComponent(Transform.class).matrix.translate(0,32);
@@ -116,6 +119,33 @@ public class TestGameMode implements GameMode {
     public void render(OrthographicCamera ui) {
     }
     
+    public class ScoreController extends Renderable {
+        private int score;
+        
+        @Override
+        public void start() {
+            this.setMessageListener(new MessageListener() {
+                public void messageReceived(GameComponent sender,String message,Object... parameters) {
+                    if(message.equals("modifyScore"))
+                        score+=(Integer)parameters[0];
+                }
+            });
+        }
+        @Override
+        public void onGui(OrthographicCamera gui) {
+            BitmapFont font=GameServices.getFonts().getValueAt(0);
+            SpriteBatch sb=GameServices.getSpriteBatch();
+            
+            font.setColor(0,0,0,1);
+            font.draw(sb,"Score: "+score,50,50);
+        }
+        @Override
+        public void update(float delta) {
+        }
+        @Override
+        public void render(OrthographicCamera camera) {
+        }
+    }
     public class PlayerController extends GameComponent {
         public float speed=50;
         private Transform transform;
@@ -123,24 +153,28 @@ public class TestGameMode implements GameMode {
         private GameObject tag;
         private ParticleSystem particleSystem;
         private AnimationController animationController;
+        private ScoreController scoreController;
+        private String text="Press F to fart";
+        
         @Override
         public void start() {
+            this.name="PlayerController";
             this.transform=super.getGameObject().getComponent(Transform.class);
             this.spriteRenderer=super.getGameObject().getComponent(SpriteRenderer.class);
             this.particleSystem=super.getGameObject().getComponent(ParticleSystem.class);
             this.animationController=super.getGameObject().getComponent(AnimationController.class);
+            this.scoreController=super.getGameObject().getComponent(ScoreController.class);
             
             animationController.play("idle");
             tag=new GameObject();
             tag.addComponent(new Transform(0,40,0.25f,0.25f).setRelative(this.transform));
-            tag.addComponent(new TextRenderer("Press F to fart"));
+            tag.addComponent(new TextRenderer(""));
             particleSystem.isTransformDependent=false;
             ((Joint)this.gameObject).addGameObject(tag);
         }
         @Override
         public void update(float delta) {
-            tag.getComponent(Transform.class).matrix.rotate(50*delta);
-            
+            updateText();
             if(Gdx.input.isKeyPressed(Keys.A))
             {
                 spriteRenderer.flipX=true;
@@ -153,6 +187,7 @@ public class TestGameMode implements GameMode {
             }
             if(Gdx.input.isKeyPressed(Keys.F))
             {
+                this.sendMessage(scoreController,"modifyScore",1);
                 if(!animationController.getAnimationByName("fart").isPlaying())
                     animationController.play("fart");
                 float speed=100;
@@ -175,6 +210,10 @@ public class TestGameMode implements GameMode {
             else if(!animationController.getAnimationByName("idle").isPlaying())
                 animationController.play("idle");
             
+        }
+        public void updateText() {
+            float time=GameServices.getElapsedTime();
+            tag.getComponent(TextRenderer.class).text=text.substring(0,Math.min((int)(time*20),text.length()));
         }
     }
 }

@@ -58,6 +58,8 @@ public class TextRenderer extends Renderable {
         Pools.free(foo);
         Pools.free(bar);
     }
+    public void onGui(OrthographicCamera gui) {
+    }
     @Override
     public void update(float delta) {
     }

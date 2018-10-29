@@ -107,4 +107,6 @@ public class ParallaxScroller extends Renderable
             Pools.free(matrix);
         }
     }
+    public void onGui(OrthographicCamera gui) {
+    }
 }

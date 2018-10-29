@@ -26,4 +26,5 @@ public abstract class Renderable extends GameComponent
     public void prepareRendering() {
     }
     public abstract void render(OrthographicCamera camera);
+    public abstract void onGui(OrthographicCamera gui);
 }

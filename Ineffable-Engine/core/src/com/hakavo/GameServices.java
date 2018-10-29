@@ -95,6 +95,14 @@ public class GameServices {
     {
         return TimeUtils.timeSinceMillis(startTime)/1000f;
     }
+    public static float getStartTime()
+    {
+        return startTime/1000f;
+    }
+    public static void resetTime()
+    {
+        startTime=TimeUtils.millis();
+    }
     public static BitmapFont createFont(FileHandle fh,int size)
     {
         FreeTypeFontGenerator generator=new FreeTypeFontGenerator(fh);

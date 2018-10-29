@@ -71,4 +71,6 @@ public class TiledBackground extends Renderable
             Pools.free(matrix);
         }
     }
+    public void onGui(OrthographicCamera gui) {
+    }
 }

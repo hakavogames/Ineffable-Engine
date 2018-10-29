@@ -22,7 +22,9 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pools;
 import java.util.Comparator;
 
 public class Engine {
@@ -41,6 +43,7 @@ public class Engine {
         
         Gdx.gl.glDisable(GL30.GL_DEPTH_TEST);
         ShaderProgram.pedantic=false;
+        GameServices.resetTime();
     }
     public void setGamemode(GameMode gameMode)
     {
@@ -66,6 +69,14 @@ public class Engine {
         for(Renderable renderable : renderList)
             if(renderable.visible)
                 renderable.render(camera);
+        
+        GameServices.spriteBatch.setProjectionMatrix(ui.combined);
+        Matrix4 mat=Pools.obtain(Matrix4.class).idt();
+        GameServices.spriteBatch.setTransformMatrix(mat);
+        Pools.free(mat);
+        for(Renderable renderable : renderList)
+            if(renderable.visible)
+                renderable.onGui(ui);
         
         GameServices.spriteBatch.end();
         gameMode.render(ui);

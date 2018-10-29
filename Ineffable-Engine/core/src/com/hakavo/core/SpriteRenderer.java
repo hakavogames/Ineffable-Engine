@@ -60,4 +60,6 @@ public class SpriteRenderer extends Renderable
             Pools.free(foo);
         }
     }
+    public void onGui(OrthographicCamera gui) {
+    }
 }

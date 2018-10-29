@@ -73,6 +73,8 @@ public class ParticleSystem extends Renderable {
             Pools.free(mat4);
         }
     }
+    public void onGui(OrthographicCamera gui) {
+    }
     
     public static class Particle {
         public float lifespan=1; // seconds

@@ -103,7 +103,11 @@ public class Joint extends GameObject
     {
         super.update(delta);
         for(int i=0;i<gameObjects.size;i++)
-            gameObjects.get(i).update(delta);
+        {
+            if(gameObjects.get(i).isDead())
+                gameObjects.removeIndex(i);
+            else gameObjects.get(i).update(delta);
+        }
     }
     @Override
     public void render(OrthographicCamera camera)

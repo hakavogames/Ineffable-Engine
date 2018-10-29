@@ -21,6 +21,7 @@ import com.badlogic.gdx.utils.*;
 public class GameObject
 {
     private boolean initialized=false;
+    protected boolean dead=false;
     public String name="default";
     public final Array<GameComponent> components=new Array<GameComponent>();
     
@@ -108,5 +109,12 @@ public class GameObject
     }
     public final boolean isInitialized() {
         return initialized;
+    }
+    
+    public final boolean isDead() {
+        return dead;
+    }
+    public final void kill() {
+        dead=true;
     }
 }
