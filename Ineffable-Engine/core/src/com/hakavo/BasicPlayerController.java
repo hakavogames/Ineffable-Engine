@@ -17,6 +17,7 @@ package com.hakavo;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pools;
@@ -34,36 +35,51 @@ import com.hakavo.core.Transform;
  * @author HakavoGames
  */
 public class BasicPlayerController extends GameComponent {
-    public float speed=50;
+        public float speed = 50f;
         private Transform transform;
         private SpriteRenderer spriteRenderer;
         private GameObject tag;
         private ParticleSystem particleSystem;
         private AnimationController animationController;
+        private int UP = Keys.W, DOWN = Keys.S, LEFT = Keys.A, RIGHT = Keys.D;
+        public BasicPlayerController() {
+        }
+        public BasicPlayerController(int UP, int DOWN, int LEFT, int RIGHT, float speed) {
+            this.UP = UP;
+            this.DOWN = DOWN;
+            this.LEFT = LEFT;
+            this.RIGHT = RIGHT;
+            this.speed = speed;
+        }
+        public BasicPlayerController(int UP, int DOWN, int LEFT, int RIGHT) {
+            this(UP, DOWN, LEFT, RIGHT, 50f);
+        }
         @Override
         public void start() {
             this.transform=super.getGameObject().getComponent(Transform.class);
             this.spriteRenderer=super.getGameObject().getComponent(SpriteRenderer.class);
-            this.particleSystem=super.getGameObject().getComponent(ParticleSystem.class);
+            //this.particleSystem=super.getGameObject().getComponent(ParticleSystem.class);
             this.animationController=super.getGameObject().getComponent(AnimationController.class);
             
             animationController.play("idle");
+            /*
             tag=new GameObject();
             tag.addComponent(new Transform(0,40,0.25f,0.25f).setRelative(this.transform));
             tag.addComponent(new TextRenderer("Press F to fart"));
             particleSystem.isTransformDependent=false;
             ((Joint)this.gameObject).addGameObject(tag);
+            */
         }
         @Override
         public void update(float delta) {
-            tag.getComponent(Transform.class).matrix.rotate(50*delta);
+            //tag.getComponent(Transform.class).matrix.rotate(50*delta);
             
-            if(Gdx.input.isKeyPressed(Input.Keys.A))
+            if(Gdx.input.isKeyPressed(LEFT))
             {
                 spriteRenderer.flipX=true;
                 transform.matrix.translate(-speed*delta,0);
             }
-            else if(Gdx.input.isKeyPressed(Input.Keys.D))
+            else if(Gdx.input.isKeyPressed(RIGHT))
             {
                 spriteRenderer.flipX=false;
                 transform.matrix.translate(speed*delta,0);

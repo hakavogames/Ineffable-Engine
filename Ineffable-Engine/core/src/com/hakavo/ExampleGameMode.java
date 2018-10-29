@@ -17,6 +17,8 @@
 package com.hakavo;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.hakavo.core.Animation;
 import com.hakavo.core.AnimationClip;
@@ -65,7 +67,7 @@ public class ExampleGameMode implements GameMode {
         Although this method looks much more simple, we recomend using an .xml file as you can
         manipulate the tiles much better such as making them collide
         */
-        Tileset posses = new Tileset(Gdx.files.internal("Scavangers_SpriteSheet.png"), 32);
+        Tileset posses = new Tileset(Gdx.files.internal("Scavengers_SpriteSheet.png"), 32);
         /*
         You can make a sprite with a texture from your tileset like this
         
@@ -171,7 +173,12 @@ public class ExampleGameMode implements GameMode {
         */
         Joint player = new Joint();
         /*
-        The Joint class is a GameObject that can hold multiple GameComponents
+        The Joint class is a GameObject that can hold multiple GameObjects
+        
+        A GameObject can hold multiple GameComponents
+        
+        The Joint class extends the GameObject so it is a GameObject with an Array of multiple
+        diffrent GameObjects. Because of this, we can also have a Joint that holds a Joint if we want
         
         I made the player a Joint as it will have a Transform, some Animations and many others!
         
@@ -211,7 +218,7 @@ public class ExampleGameMode implements GameMode {
         
         You can use the BasicPlayerController class we included in the Engine
         */
-        player.addComponent(new BasicPlayerController());
+        player.addComponent(new BasicPlayerController(Keys.W, Keys.S, Keys.A, Keys.D, 50f));
     }
 
     @Override
