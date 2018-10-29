@@ -20,10 +20,16 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Pools;
 import com.hakavo.core.Animation;
 import com.hakavo.core.AnimationClip;
 import com.hakavo.core.AnimationController;
+import com.hakavo.core.GameObject;
 import com.hakavo.core.Joint;
+import com.hakavo.core.ParallaxScroller;
 import com.hakavo.core.Sprite2D;
 import com.hakavo.core.SpriteRenderer;
 import com.hakavo.core.Transform;
@@ -216,14 +222,183 @@ public class ExampleGameMode implements GameMode {
         /*
         In order to move the player around we need a player controller class
         
-        You can use the BasicPlayerController class we included in the Engine
+        You can use the BasicPlayerController class we included in the Engine or create your own class
         */
         player.addComponent(new BasicPlayerController(Keys.W, Keys.S, Keys.A, Keys.D, 50f));
+        /*
+        Now we cam set the player to a layer. Layers are rendered in the order of their value. First are
+        GameObjects with biggest layer value, then the next one and so on. The layer value is hold by the Renderable class.
+        The classes that extend Renderable and have a layer value are: SpriteRenderer, ParallaxScroller,
+        TextRenderer, ParticleSystem and TiledBackground.
+        
+        In our case we added a SpriteRenderer to the player so we can use the layer value of the SpriteRenderer
+        we just added.
+        
+        You can do it like this
+        */
+        player.getComponent(SpriteRenderer.class).layer = 3;
+        /*
+        I called the getComponent method of the Joint player (because Joint class extends GameObject) and I
+        put as argument SpriteRenderer.class because we want the SpriteRenderer class from the GameComponents
+        array of the Joint.
+        
+        Then I added .layer to get the layer value of the SpriteRenderer class and I passed to it the value 3
+        as I want it to be on the third layer.
+        
+        The Renderable classes also have a visible boolean value. This means that if you set it to true the
+        Engine will know to render the GameObject having the class as a GameComponent. If it is false it won't render it.
+        
+        If we run it as it is until this point we can see that it won't render the player and that is because
+        we need to add the player to the Engine's level Joint.
+        
+        We can do it like this
+        */
+        engine.level.addGameObject(player);
+        /*
+        To add it we just use the method addGameObject from the Joint class, in this case Engine's level Joint
+        
+        The parameter is the GameObject we want to add to the Engine, in this case the player Joint
+        
+        Now if we run it we can see our player on the screen and we can move it with the keys we set, in this
+        case W, A, S and D
+        
+        But the camera won't follow the player as we didn't set it to
+        
+        To set the camera to follow the player, you have to do something in update so that every time
+        the player moves the camera will go to it's position
+        
+        Now go to the update method down the class and look what is inside
+        
+        
+        
+        Now that the camera follows the player it's time for some background
+        
+        There are 2 types of background:
+            -tiled background
+            -texture background
+        
+        In this tutorial we will learn hou to make the texture background because it allows for some more
+        powerful things such as ParallaxScrolling
+        
+        ParallaxScrolling is how the background that looks to be further moves slower as you move than the one closer.
+        It is usually used at WebPages but it also allows for some cool effects in games
+        
+        First we need all the Sprite2Ds we will have in the background. I will
+        make exactly the same background of the TestGameMode GameMode because I'm lazy
+        */
+        Sprite2D l1 = new Sprite2D(new TextureRegion(new Texture(Gdx.files.internal("parallax/mountain/trees1.png"))));
+        Sprite2D l2 = new Sprite2D(new TextureRegion(new Texture(Gdx.files.internal("parallax/mountain/trees2.png"))));
+        Sprite2D l3 = new Sprite2D(new TextureRegion(new Texture(Gdx.files.internal("parallax/mountain/trees3.png"))));
+        Sprite2D l4 = new Sprite2D(new TextureRegion(new Texture(Gdx.files.internal("parallax/mountain/mountains.png"))));
+        Sprite2D l5 = new Sprite2D(new TextureRegion(new Texture(Gdx.files.internal("parallax/mountain/clouds.png"))));
+        Sprite2D l6 = new Sprite2D(new TextureRegion(new Texture(Gdx.files.internal("parallax/mountain/background.png"))));
+        /*
+        Here comes the fun part. We will create a ParallaxScroller object for every Sprite2D we made
+        
+        You can do one like this
+        */
+        ParallaxScroller p1 = new ParallaxScroller(l1, 1f);
+        /*
+        The first argument is the Sprite2D we are asigning to the ParallaxScroller. The second one is the speed of the
+        scrolling which should be between 0f and 1f where 1 will be for the near background and 0 for the further one.
+        
+        You can also give 2 more arguments for which axis to do the scrolling on: x or y which are boolean values
+        
+        Now I will also make the other ParallaxScrollers
+        */
+        ParallaxScroller p2 = new ParallaxScroller(l2, 0.75f);
+        ParallaxScroller p3 = new ParallaxScroller(l3, 0.4f);
+        ParallaxScroller p4 = new ParallaxScroller(l4, 0.15f);
+        ParallaxScroller p5 = new ParallaxScroller(l5, 0.05f);
+        ParallaxScroller p6 = new ParallaxScroller(l6, 0f);
+        /*
+        As you remember the ParallaxScroller extends Renderable so it has a layer value which we have to set
+        
+        I will set them all here
+        */
+        p1.layer = 5;
+        p2.layer = 6;
+        p3.layer = 7;
+        p4.layer = 8;
+        p5.layer = 9;
+        p6.layer = 10;
+        /*
+        Now we can create a new background GameObject that will hold all those ParallaxScrollers
+        */
+        GameObject bg = new GameObject();
+        /*
+        We will give it a name
+        */
+        bg.name = "background";
+        /*
+        And now we will pass all the scrollers to the background object and also a Transform GameComponent
+        */
+        bg.addComponents(new Transform(0, 0, 0.4f, 0.4f), p1, p2, p3, p4, p5, p6);
+        /*
+        And finally we will pass the background to the Engine
+        */
+        engine.level.addGameObject(bg);
+        /*
+        If we run it we can see that the background is there and if we move it gives the ParallaxScrolling effect!
+        */
+        
     }
 
     @Override
     public void update(float delta) {
+        /*
+        First we need a temporary Vector2. By temporary I meant we need to use Pools. Pools are used to
+        hold temporary data such as Vector2s Vector3s Matrix4s and many others. You can get a temporary
+        Vector2 from the Pools class you can do the following
+        */
+        Vector2 pos = Pools.obtain(Vector2.class);
+        /*
+        pos is just the name I gave to the Vector2. I used the obtain() method from the Pools class to get
+        a new class from it. Then I put as it's parameter Vector2.class as I wanted a Vector2 class.
         
+        Now we need a refrance to the player GameObject we created. We can't reffer directly to it as we
+        declared it in the init() method so it will be deleted after initialization
+        
+        Remember that we passed the player to the Engine? We will take the player from the Engine's level Joint
+        
+        You can do it like this
+        */
+        GameObject player = engine.level.getGameObjectByName("player");
+        /*
+        I used the getGameObjectByName method of the Joint because I gave the player the name "player" so
+        that I can reffer to it from the level Joint as I did here
+        
+        Now we need to get the translation of the player but also check if it found any because
+        if we didn't pass to the level Joint any GameObject with the name "player", then it gave a null object
+        
+        I will show you this step without many explanation as there would be a lot to go through
+        */
+        if(player != null)
+            player.getComponent(Transform.class).matrix.getTranslation(pos);
+        /*
+        I got the Transform class of the player and used the getTranslation() method of it's matrix with the
+        parameter pos so that it will return the translation of the player to the pos Vector2
+        
+        Now that we have the position of the player we can set the camera to the same position
+        
+        You can do it like this
+        */
+        camera.position.set(pos.x, pos.y, 0);
+        /*
+        I set the position of the camera to the x and y values of the pos Vector2
+        
+        Altough it looks done, we need to free the Vector2 from the Pools class for later use
+        
+        You can do it like this
+        */
+        Pools.free(pos);
+        /*
+        I used the free() method and I passed the pos Vector2 as it's parameter
+        
+        Now, if we run the code we can see that the camera follows the player wherever it goes
+        altough it's hard to see because we have a black background. Go back in init() to where
+        you left to see how to add a background!
+        */
     }
 
     @Override

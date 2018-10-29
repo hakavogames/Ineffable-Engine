@@ -5,14 +5,22 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
       <group>
-        <file>file:/C:/Users/cosmin_/Desktop/Game/core/src/com/kozma/core/GameObject.java</file>
-        <file>file:/C:/Users/cosmin_/Desktop/Game/core/src/com/kozma/core/GameComponent.java</file>
-        <file>file:/C:/Users/cosmin_/Desktop/Game/core/src/com/kozma/core/ARenderable.java</file>
+        <file>file:/A:/Documents/GitHub%20Desktp%20Repositories/Ineffable-Engine/Ineffable-Engine/core/src/com/hakavo/core/ParallaxScroller.java</file>
+        <file>file:/A:/Documents/GitHub%20Desktp%20Repositories/Ineffable-Engine/Ineffable-Engine/core/src/com/hakavo/ExampleGameMode.java</file>
+        <file>file:/A:/Documents/GitHub%20Desktp%20Repositories/Ineffable-Engine/Ineffable-Engine/core/src/com/hakavo/TestGameMode.java</file>
+        <file>file:/A:/Documents/GitHub%20Desktp%20Repositories/Ineffable-Engine/Ineffable-Engine/core/src/com/hakavo/BasicPlayerController.java</file>
+        <file>file:/A:/Documents/GitHub%20Desktp%20Repositories/Ineffable-Engine/Ineffable-Engine/core/src/com/hakavo/Engine.java</file>
       </group>
     </open-files>
     <editor-bookmarks lastBookmarkId="0" xmlns="http://www.netbeans.org/ns/editor-bookmarks/2"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-      <group/>
+      <group>
+        <file>file:/A:/Documents/GitHub%20Desktp%20Repositories/Ineffable-Engine/Ineffable-Engine/core/src/com/hakavo/core/ParallaxScroller.java</file>
+        <file>file:/A:/Documents/GitHub%20Desktp%20Repositories/Ineffable-Engine/Ineffable-Engine/core/src/com/hakavo/ExampleGameMode.java</file>
+        <file>file:/A:/Documents/GitHub%20Desktp%20Repositories/Ineffable-Engine/Ineffable-Engine/core/src/com/hakavo/TestGameMode.java</file>
+        <file>file:/A:/Documents/GitHub%20Desktp%20Repositories/Ineffable-Engine/Ineffable-Engine/core/src/com/hakavo/BasicPlayerController.java</file>
+        <file>file:/A:/Documents/GitHub%20Desktp%20Repositories/Ineffable-Engine/Ineffable-Engine/core/src/com/hakavo/Engine.java</file>
+      </group>
     </open-files>
   </auxiliary>
 </gradle-project-properties>

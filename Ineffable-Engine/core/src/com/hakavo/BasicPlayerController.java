@@ -19,7 +19,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pools;
 import com.hakavo.core.AnimationController;
 import com.hakavo.core.GameComponent;
@@ -83,6 +82,14 @@ public class BasicPlayerController extends GameComponent {
             {
                 spriteRenderer.flipX=false;
                 transform.matrix.translate(speed*delta,0);
+            }
+            if(Gdx.input.isKeyPressed(UP))
+            {
+                transform.matrix.translate(0, speed*delta);
+            }
+            else if(Gdx.input.isKeyPressed(DOWN))
+            {
+                transform.matrix.translate(0, -speed*delta);
             }
         }
 }

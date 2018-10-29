@@ -42,10 +42,10 @@ public class ParallaxScroller extends Renderable
         this(sprite,speed,true,false);
     }
     public ParallaxScroller(Sprite2D sprite) {
-        this(sprite,1f);
+        this(sprite,1f, true, false);
     }
     public ParallaxScroller() {
-        this(null);
+        this(null, 1f, true, false);
     }
     @Override
     public void start() {
