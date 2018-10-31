@@ -74,6 +74,7 @@ public class TestGameMode implements GameMode {
         player.addComponent(new PlayerController());
         player.addComponent(new ParticleSystem(fireSprite));
         player.addComponent(new ScoreController());
+        player.addComponent(new Soundtrack(Gdx.files.internal("sounds/soundtracks/funky song - oldschool game song 1.0.wav"), 1f, 1));
         
         background.getComponent(TiledBackground.class).layer=3;
         background.getComponent(Transform.class).matrix.translate(0,32);
@@ -154,6 +155,7 @@ public class TestGameMode implements GameMode {
         private ParticleSystem particleSystem;
         private AnimationController animationController;
         private ScoreController scoreController;
+        private Soundtrack soundTrack;
         private String text="Press F to fart";
         
         @Override
@@ -164,6 +166,7 @@ public class TestGameMode implements GameMode {
             this.particleSystem=super.getGameObject().getComponent(ParticleSystem.class);
             this.animationController=super.getGameObject().getComponent(AnimationController.class);
             this.scoreController=super.getGameObject().getComponent(ScoreController.class);
+            this.soundTrack = super.getGameObject().getComponent(Soundtrack.class);
             
             animationController.play("idle");
             tag=new GameObject();
@@ -209,6 +212,16 @@ public class TestGameMode implements GameMode {
             }
             else if(!animationController.getAnimationByName("idle").isPlaying())
                 animationController.play("idle");
+            if(Gdx.input.isKeyPressed(Keys.T)) {
+                soundTrack.play();
+            }
+            if(Gdx.input.isKeyPressed(Keys.R)) {
+                soundTrack.stop();
+            }
+            if(Gdx.input.isKeyPressed(Keys.Y)) {
+                soundTrack.pause();
+            }
+            //soundTrack.setVolume(soundTrack.getVolume() - 0.001f);
             
         }
         public void updateText() {
