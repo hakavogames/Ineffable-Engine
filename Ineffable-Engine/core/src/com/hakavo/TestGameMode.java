@@ -65,6 +65,12 @@ public class TestGameMode implements GameMode {
         Animation fart=new Animation("fart",clip2);
         AnimationController animationController=new AnimationController(sprite,idle,fart);
         
+        SoundEffect fart_sound = new SoundEffect(Gdx.files.internal("sounds/sound effects/242004__junkfood2121__fart-01.wav"), 1f, 1);
+        fart_sound.name = "fart";
+        fart_sound.setLooping(true);
+        
+        SoundEffects playerSounds = new SoundEffects(fart_sound);
+        
         Sprite2D fireSprite=new Sprite2D(new TextureRegion(new Texture(Gdx.files.internal("fire.png"))));
         Joint player=new Joint();
         player.name="player";
@@ -74,7 +80,7 @@ public class TestGameMode implements GameMode {
         player.addComponent(new PlayerController());
         player.addComponent(new ParticleSystem(fireSprite));
         player.addComponent(new ScoreController());
-        player.addComponent(new Soundtrack(Gdx.files.internal("sounds/soundtracks/funky song - oldschool game song 1.0.wav"), 1f, 1));
+        player.addComponent(playerSounds);
         
         background.getComponent(TiledBackground.class).layer=3;
         background.getComponent(Transform.class).matrix.translate(0,32);
@@ -155,7 +161,7 @@ public class TestGameMode implements GameMode {
         private ParticleSystem particleSystem;
         private AnimationController animationController;
         private ScoreController scoreController;
-        private Soundtrack soundTrack;
+        private SoundEffects sounds;
         private String text="Press F to fart";
         
         @Override
@@ -166,7 +172,7 @@ public class TestGameMode implements GameMode {
             this.particleSystem=super.getGameObject().getComponent(ParticleSystem.class);
             this.animationController=super.getGameObject().getComponent(AnimationController.class);
             this.scoreController=super.getGameObject().getComponent(ScoreController.class);
-            this.soundTrack = super.getGameObject().getComponent(Soundtrack.class);
+            this.sounds = super.getGameObject().getComponent(SoundEffects.class);
             
             animationController.play("idle");
             tag=new GameObject();
@@ -187,6 +193,10 @@ public class TestGameMode implements GameMode {
             {
                 spriteRenderer.flipX=false;
                 transform.matrix.translate(speed*delta,0);
+            }
+            if(Gdx.input.isKeyJustPressed(Keys.F)) {
+                sounds.getSoundByName("fart").play();
+                sounds.getSoundByName("fart").setLooping(true);
             }
             if(Gdx.input.isKeyPressed(Keys.F))
             {
@@ -210,19 +220,11 @@ public class TestGameMode implements GameMode {
                     Pools.free(playerPos);
                 }
             }
-            else if(!animationController.getAnimationByName("idle").isPlaying())
-                animationController.play("idle");
-            if(Gdx.input.isKeyPressed(Keys.T)) {
-                soundTrack.play();
+            else {
+                if(!animationController.getAnimationByName("idle").isPlaying())
+                    animationController.play("idle");
+                sounds.getSoundByName("fart").stop();
             }
-            if(Gdx.input.isKeyPressed(Keys.R)) {
-                soundTrack.stop();
-            }
-            if(Gdx.input.isKeyPressed(Keys.Y)) {
-                soundTrack.pause();
-            }
-            //soundTrack.setVolume(soundTrack.getVolume() - 0.001f);
-            
         }
         public void updateText() {
             float time=GameServices.getElapsedTime();

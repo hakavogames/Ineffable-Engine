@@ -81,25 +81,38 @@ public class SoundEffect extends Hearable {
         lastEmptyID++;
     }
     public void pause() {
-        sound.pause(ids[lastEmptyID - 1]);
+        if(lastEmptyID > 0)sound.pause(ids[lastEmptyID - 1]);
     }
     public void pause(int IDIndex) {
-        sound.pause(ids[IDIndex]);
+        if(IDIndex >= 0)sound.pause(ids[IDIndex]);
     }
     public void resume() {
-        sound.resume(ids[lastEmptyID - 1]);
+        if(lastEmptyID > 0)sound.resume(ids[lastEmptyID - 1]);
     }
     public void resume(int IDIndex) {
-        sound.resume(ids[IDIndex]);
+        if(IDIndex >= 0)sound.resume(ids[IDIndex]);
     }
     public void stop() {
-        sound.stop(ids[lastEmptyID - 1]);
+        if(lastEmptyID > 0) {
+            sound.stop(ids[lastEmptyID - 1]);
+            ids[lastEmptyID - 1] = 0;
+            lastEmptyID--;
+        }
     }
     public void stop(int IDIndex) {
-        sound.stop(ids[IDIndex]);
+        if(IDIndex >= 0 && IDIndex < lastEmptyID) {
+            sound.stop(ids[IDIndex]);
+            for(int i = IDIndex; i < lastEmptyID - 1; i++) {
+                ids[i] = ids[i + 1];
+            }
+            ids[lastEmptyID - 1] = 0;
+            lastEmptyID--;
+        }
+        
     }
     public long getID() {
-        return ids[lastEmptyID - 1];
+        if(lastEmptyID > 0)return ids[lastEmptyID - 1];
+        return 0;
     }
     public int getIndex() {
         return (lastEmptyID - 1);
@@ -111,46 +124,45 @@ public class SoundEffect extends Hearable {
         return -1;
     }
     public long getIDByIndex(int IDIndex) {
-        return ids[IDIndex];
+        if(IDIndex >= 0)return ids[IDIndex];
+        return 0;
     }
     public void setPanLeft() {
-        sound.setPan(ids[lastEmptyID - 1], -1, this.volume);
+        if(lastEmptyID > 0)sound.setPan(ids[lastEmptyID - 1], -1, this.volume);
     }
     public void setPanLeft(int IDIndex) {
-        sound.setPan(ids[IDIndex], -1, this.volume);
+        if(IDIndex >= 0)sound.setPan(ids[IDIndex], -1, this.volume);
     }
     public void setPanRight() {
-        sound.setPan(ids[lastEmptyID - 1], 1, this.volume);
+        if(lastEmptyID > 0)sound.setPan(ids[lastEmptyID - 1], 1, this.volume);
     }
     public void setPanRight(int IDIndex) {
-        sound.setPan(ids[IDIndex], 1, this.volume);
+        if(IDIndex >= 0)sound.setPan(ids[IDIndex], 1, this.volume);
     }
     public void setPan(float position, float volume) {
-        sound.setPan(ids[lastEmptyID - 1], position, volume);
+        if(lastEmptyID > 0)sound.setPan(ids[lastEmptyID - 1], position, volume);
     }
     public void setPan(float position, float volume, int IDIndex) {
-        sound.setPan(ids[IDIndex], position, volume);
+        if(IDIndex >= 0)sound.setPan(ids[IDIndex], position, volume);
     }
     public void setPitch(float factor) {
-        sound.setPitch(ids[lastEmptyID - 1], factor);
+        if(lastEmptyID > 0)sound.setPitch(ids[lastEmptyID - 1], factor);
     }
     public void setPitch(float factor, int IDIndex) {
-        sound.setPitch(ids[IDIndex], factor);
+        if(IDIndex >= 0)sound.setPitch(ids[IDIndex], factor);
     }
     public void setLooping(boolean loop) {
-        sound.setLooping(ids[lastEmptyID - 1], loop);
+        if(lastEmptyID > 0)sound.setLooping(ids[lastEmptyID - 1], loop);
     }
     public void setLooping(boolean loop, int IDIndex) {
-        sound.setLooping(ids[IDIndex], loop);
+        if(IDIndex >= 0)sound.setLooping(ids[IDIndex], loop);
     }
 
     @Override
     public void update(float delta) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public void start() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

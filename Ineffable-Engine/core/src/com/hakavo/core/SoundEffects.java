@@ -31,6 +31,17 @@ public class SoundEffects extends GameComponent {
             effects.add(sound);
         }
     }
+    public SoundEffect getSoundByName(String name) {
+        int index = getSoundIndexByName(name);
+        if(index != -1)return effects.get(index);
+        return null;
+    }
+    public int getSoundIndexByName(String name) {
+        for(int i = 0; i < effects.size; i++) {
+            if(effects.get(i).name.equals(name))return i;
+        }
+        return -1;
+    }
     
     @Override
     public void update(float delta) {
