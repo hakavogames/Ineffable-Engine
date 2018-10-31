@@ -71,6 +71,10 @@ public class TestGameMode implements GameMode {
         
         SoundEffects playerSounds = new SoundEffects(fart_sound);
         
+        Soundtrack track = new Soundtrack(Gdx.files.internal("sounds/soundtracks/game song.wav"), 1f, 1);
+        track.play();
+        track.setLooping(true);
+        
         Sprite2D fireSprite=new Sprite2D(new TextureRegion(new Texture(Gdx.files.internal("fire.png"))));
         Joint player=new Joint();
         player.name="player";
