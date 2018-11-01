@@ -28,9 +28,19 @@ public class SpriteRenderer extends Renderable
     public Color color=new Color(1,1,1,1);
     private Transform transform;
     
-    public SpriteRenderer(Sprite2D sprite)
+    public SpriteRenderer(Sprite2D sprite,boolean flipX,boolean flipY,float scaleX,float scaleY)
     {
         this.sprite=sprite;
+        this.flipX=flipX;
+        this.flipY=flipY;
+    }
+    public SpriteRenderer(Sprite2D sprite,boolean flipX,boolean flipY)
+    {
+        this(sprite,flipX,flipY,1,1);
+    }
+    public SpriteRenderer(Sprite2D sprite)
+    {
+        this(sprite,false,false);
     }
     @Override
     public void start() {
@@ -55,7 +65,6 @@ public class SpriteRenderer extends Renderable
             sb.setColor(color);
             sb.draw(tr.getTexture(),0,0,tr.getRegionWidth(),tr.getRegionHeight(),
                     tr.getRegionX(),tr.getRegionY(),tr.getRegionWidth(),tr.getRegionHeight(),flipX,flipY);
-            
             Pools.free(mat);
             Pools.free(foo);
         }

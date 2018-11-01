@@ -20,11 +20,12 @@ import com.hakavo.core.Joint;
 import com.hakavo.core.GameObject;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
+import com.hakavo.core.collision.Collider;
+import com.hakavo.core.GameComponent;
 import java.util.Comparator;
 
 public class Engine {
@@ -35,9 +36,11 @@ public class Engine {
     public void init() {
         GameServices.init();
         camera=new OrthographicCamera();
-        camera.setToOrtho(false,Gdx.graphics.getWidth()/4,Gdx.graphics.getHeight()/4);
+        camera.setToOrtho(false,400,225);
         ui=new OrthographicCamera();
         ui.setToOrtho(false,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+        
+        level.addComponent(new GameManager());
         gameMode.init(this);
         level.start();
         
@@ -87,5 +90,31 @@ public class Engine {
         gameMode.update(delta);
         camera.update();
         GameServices.getSpriteBatch().setProjectionMatrix(camera.combined);
+    }
+    private class GameManager extends GameComponent {
+        private Joint level;
+        private Array<GameObject> gameObjects;
+        
+        @Override
+        public void start() {
+            level=(Joint)this.getGameObject();
+            gameObjects=new Array<GameObject>();
+        }
+        @Override
+        public void update(float delta) {
+            gameObjects.clear();
+            
+            Array<Collider> colliders=new Array<Collider>();
+            
+            for(GameObject gameObject : level.getAllGameObjects(gameObjects))
+                colliders.addAll(gameObject.getComponents(Collider.class));
+            
+            for(Collider collider : colliders)
+                for(int i=0;i<colliders.size;i++)
+                {
+                    if(!colliders.get(i).equals(collider))
+                        collider.testCollision(colliders.get(i));
+                }
+        }
     }
 }

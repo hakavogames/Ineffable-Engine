@@ -15,6 +15,7 @@
  */
 
 package com.hakavo;
+import com.hakavo.core.collision.*;
 import com.hakavo.gameobjects.*;
 import com.hakavo.core.*;
 import com.badlogic.gdx.*;
@@ -33,6 +34,7 @@ public class TestGameMode implements GameMode {
     Map map;
     OrthographicCamera camera;
     Engine engine;
+    Tileset poses;
     
     public TestGameMode() {
     }
@@ -48,9 +50,9 @@ public class TestGameMode implements GameMode {
         background.addComponent(new TiledBackground(wall));
         background.getComponent(Transform.class).matrix.setToScaling(1,1);
         
-        Tileset poses=new Tileset(Gdx.files.internal("Scavengers_SpriteSheet.png"),32);
         Sprite2D sprite=new Sprite2D();
         
+        poses=new Tileset(Gdx.files.internal("Scavengers_SpriteSheet.png"),32);
         AnimationClip clip1=new AnimationClip();
         for(int i=0;i<6;i++)clip1.frames.add(poses.tiles.get(i).createTextureRegion());
         clip1.duration=1f;
@@ -65,12 +67,15 @@ public class TestGameMode implements GameMode {
         Animation fart=new Animation("fart",clip2);
         AnimationController animationController=new AnimationController(sprite,idle,fart);
         
+        initEnemy();
+        
         Sprite2D fireSprite=new Sprite2D(new TextureRegion(new Texture(Gdx.files.internal("fire.png"))));
         Joint player=new Joint();
         player.name="player";
         player.addComponent(new Transform());
         player.addComponent(new SpriteRenderer(sprite));
         player.addComponent(animationController);
+        player.addComponent(new BoxCollider());
         player.addComponent(new PlayerController());
         player.addComponent(new ParticleSystem(fireSprite));
         player.addComponent(new ScoreController());
@@ -106,6 +111,93 @@ public class TestGameMode implements GameMode {
         
         engine.level.addGameObject(bg);
     }
+    public void initEnemy() {
+        Sprite2D enemySprite=new Sprite2D();
+        
+        AnimationClip idleClip=new AnimationClip();
+        for(int i=12;i<18;i++)idleClip.frames.add(poses.tiles.get(i).createTextureRegion());
+        idleClip.duration=1f;
+        idleClip.loop=true;
+        Animation idle=new Animation("idle",idleClip);
+        
+        AnimationClip hitClip=new AnimationClip();
+        for(int i=44;i<46;i++)hitClip.frames.add(poses.tiles.get(i).createTextureRegion());
+        hitClip.duration=0.3f;
+        hitClip.loop=true;
+        Animation hit=new Animation("hit",hitClip);
+        
+        
+        AnimationController animController=new AnimationController(enemySprite,idle,hit);
+        
+        GameObject enemy=new GameObject();
+        enemy.name="zombie";
+        enemy.addComponent(new Transform(150,0));
+        enemy.addComponent(new SpriteRenderer(enemySprite,false,false));
+        enemy.addComponent(new BoxCollider());
+        enemy.addComponent(animController);
+        enemy.addComponent(new GameComponent() {
+            private float health=100;
+            public void start() {
+                this.setMessageListener(new MessageListener() {
+                    @Override
+                    public void messageReceived(GameObject sender,String message,Object... args) {
+                        if(message.equals("damage"))
+                            health-=(Float)args[0];
+                    }
+                });
+            }
+            public void update(float delta) {
+                if(health<=0)
+                    this.getGameObject().kill();
+            }
+        });
+        enemy.addComponent(new GameComponent() {
+            private Transform transform;
+            private AnimationController animController;
+            private SpriteRenderer spriteRenderer;
+            private BoxCollider collider;
+            @Override
+            public void start() {
+                transform=this.getGameObject().getComponent(Transform.class);
+                animController=this.getGameObject().getComponent(AnimationController.class);
+                spriteRenderer=this.getGameObject().getComponent(SpriteRenderer.class);
+                collider=this.getGameObject().getComponent(BoxCollider.class);
+                collider.collisionAdapter=new CollisionAdapter() {
+                    @Override
+                    public void onCollision(GameObject gameObject) {
+                        if(gameObject.name.equals("player"))
+                        {
+                            TextRenderer tr=((Joint)gameObject).gameObjects.get(0).getComponent(TextRenderer.class);
+                            tr.text="";
+                            for(int i=0;i<10;i++)
+                                tr.text+=(char)MathUtils.random(255);
+                        }
+                    }
+                };
+                spriteRenderer.layer=3;
+                
+                animController.play("idle");
+            }
+            @Override
+            public void update(float delta) {
+                collider.setSize(spriteRenderer.sprite.textureRegion.getRegionWidth(),spriteRenderer.sprite.textureRegion.getRegionHeight());
+                Vector2 position=new Vector2();
+                engine.level.getGameObjectByName("player").getComponent(Transform.class).getPosition(position);
+                
+                float dist=position.x-transform.getPosition(new Vector2()).x;
+                
+                if(Math.abs(dist)<=50&&animController.getCurrentAnimation().name.equals("idle"))
+                    animController.play("hit");
+                if(Math.abs(dist)>50&&animController.getCurrentAnimation().name.equals("hit"))
+                    animController.play("idle");
+                
+                if(dist>=0)spriteRenderer.flipX=true;
+                else spriteRenderer.flipX=false;
+            }
+        });
+        
+        engine.level.addGameObject(enemy);
+    }
     @Override
     public void update(float delta) {
         Vector2 pos=Pools.obtain(Vector2.class);
@@ -118,6 +210,56 @@ public class TestGameMode implements GameMode {
     @Override
     public void render(OrthographicCamera ui) {
     }
+
+    private static class Arrow extends GameObject {
+        Transform transform;
+        SpriteRenderer spriteRenderer;
+        BoxCollider collider;
+        ArrowBehaviour arrowBehaviour;
+        
+        public Arrow(boolean flipX) {
+            Sprite2D arrow=new Sprite2D(new TextureRegion(new Texture("sprites/arrow.png"))); 
+            transform=new Transform(0,24,0.5f,0.5f);
+            collider=new BoxCollider(0,0,arrow.textureRegion.getRegionWidth(),arrow.textureRegion.getRegionHeight());
+            spriteRenderer=new SpriteRenderer(arrow,flipX,false);
+            spriteRenderer.layer=2;
+            arrowBehaviour=new ArrowBehaviour(flipX);
+            
+            super.addComponents(transform,spriteRenderer,collider,arrowBehaviour);
+        }
+        
+        private static class ArrowBehaviour extends GameComponent {
+            Transform transform;
+            BoxCollider collider;
+            float spawnTime=0,lifespan=2;
+            float direction=1;
+            
+            public ArrowBehaviour(boolean flipX) {
+                if(flipX)direction=-1;
+            }
+            public void start() {
+                transform=super.getGameObject().getComponent(Transform.class);
+                collider=super.getGameObject().getComponent(BoxCollider.class);
+                spawnTime=GameServices.getElapsedTime();
+                
+                collider.collisionAdapter=new CollisionAdapter() {
+                    @Override
+                    public void onCollision(GameObject gameObject) {
+                        if(gameObject.name.equals("zombie"))
+                        {
+                            getGameObject().getComponent(ArrowBehaviour.class).sendMessage(gameObject,"damage",30f);
+                            getGameObject().kill();
+                        }
+                    }
+                };
+            }
+            public void update(float delta) {
+                if(GameServices.getElapsedTime()-spawnTime>=lifespan){super.getGameObject().kill();return;}
+                
+                transform.matrix.translate(direction*400*delta,0);
+            }
+        }
+    }
     
     public class ScoreController extends Renderable {
         private int score;
@@ -125,7 +267,7 @@ public class TestGameMode implements GameMode {
         @Override
         public void start() {
             this.setMessageListener(new MessageListener() {
-                public void messageReceived(GameComponent sender,String message,Object... parameters) {
+                public void messageReceived(GameObject sender,String message,Object... parameters) {
                     if(message.equals("modifyScore"))
                         score+=(Integer)parameters[0];
                 }
@@ -154,7 +296,8 @@ public class TestGameMode implements GameMode {
         private ParticleSystem particleSystem;
         private AnimationController animationController;
         private ScoreController scoreController;
-        private String text="Press F to fart";
+        private BoxCollider collider;
+        private String text="Press E to shoot";
         
         @Override
         public void start() {
@@ -164,6 +307,7 @@ public class TestGameMode implements GameMode {
             this.particleSystem=super.getGameObject().getComponent(ParticleSystem.class);
             this.animationController=super.getGameObject().getComponent(AnimationController.class);
             this.scoreController=super.getGameObject().getComponent(ScoreController.class);
+            this.collider=super.getGameObject().getComponent(BoxCollider.class);
             
             animationController.play("idle");
             tag=new GameObject();
@@ -174,6 +318,7 @@ public class TestGameMode implements GameMode {
         }
         @Override
         public void update(float delta) {
+            collider.setSize(spriteRenderer.sprite.textureRegion.getRegionWidth(),spriteRenderer.sprite.textureRegion.getRegionHeight());
             updateText();
             if(Gdx.input.isKeyPressed(Keys.A))
             {
@@ -185,27 +330,17 @@ public class TestGameMode implements GameMode {
                 spriteRenderer.flipX=false;
                 transform.matrix.translate(speed*delta,0);
             }
+            if(Gdx.input.isKeyJustPressed(Keys.E))
+            {
+                Arrow arrow=new Arrow(spriteRenderer.flipX);
+                arrow.getComponent(Transform.class).setRelative(transform);
+                this.getGameObject().getParent().addGameObject(arrow);
+            }
             if(Gdx.input.isKeyPressed(Keys.F))
             {
-                this.sendMessage(scoreController,"modifyScore",1);
                 if(!animationController.getAnimationByName("fart").isPlaying())
                     animationController.play("fart");
-                float speed=100;
-                if(particleSystem.particles.size<500)
-                {
-                    Vector2 playerPos=Pools.obtain(Vector2.class);
-                    transform.matrix.getTranslation(playerPos);
-                    
-                    float x=MathUtils.random(-10,-7);
-                    float y=MathUtils.random(-2,2);
-                    Vector2 dir=new Vector2(x,y).nor().scl(0.4f);
-                    particleSystem.particles.add(new Particle(MathUtils.random(-40,-20)+playerPos.x,MathUtils.random(-15,-10)+playerPos.y,
-                                                              0.15f,0.15f,
-                                                              dir.x*speed*MathUtils.random(1.5f,3f),dir.y*speed*MathUtils.random(1.5f,3f),
-                                                              2f*MathUtils.random(0.5f,1.5f),2));
-                    
-                    Pools.free(playerPos);
-                }
+                fart();
             }
             else if(!animationController.getAnimationByName("idle").isPlaying())
                 animationController.play("idle");
@@ -214,6 +349,24 @@ public class TestGameMode implements GameMode {
         public void updateText() {
             float time=GameServices.getElapsedTime();
             tag.getComponent(TextRenderer.class).text=text.substring(0,Math.min((int)(time*20),text.length()));
+        }
+        public void fart() {
+            this.sendMessage(this.getGameObject(),"modifyScore",1);
+            if(particleSystem.particles.size<500)
+            {
+                Vector2 playerPos=Pools.obtain(Vector2.class);
+                transform.matrix.getTranslation(playerPos);
+                
+                float x=MathUtils.random(-10,-7);
+                float y=MathUtils.random(-2,2);
+                Vector2 dir=new Vector2(x,y).nor().scl(0.4f);
+                particleSystem.particles.add(new Particle(MathUtils.random(-40,-20)+playerPos.x,MathUtils.random(-15,-10)+playerPos.y,
+                                                          0.15f,0.15f,
+                                                          dir.x*speed*MathUtils.random(1.5f,3f),dir.y*speed*MathUtils.random(1.5f,3f),
+                                                          2f*MathUtils.random(0.5f,1.5f),2));
+                
+                Pools.free(playerPos);
+            }
         }
     }
 }

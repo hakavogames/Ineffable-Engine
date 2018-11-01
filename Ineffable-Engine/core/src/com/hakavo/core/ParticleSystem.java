@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.hakavo.GameServices;
+import com.hakavo.core.collision.PointCollider;
 
 public class ParticleSystem extends Renderable {
     public Sprite2D sprite;

@@ -20,7 +20,7 @@ public abstract class GameComponent
 {
     protected GameObject gameObject;
     protected MessageListener messageListener;
-    public String name;
+    public String name="";
     
     public abstract void update(float delta);
     public abstract void start();
@@ -30,8 +30,7 @@ public abstract class GameComponent
     public final GameObject getGameObject() {return gameObject;}
     public final MessageListener getMessageListener() {return messageListener;}
     
-    public final void sendMessage(GameComponent gameComponent,String message,Object... parameters) {
-        if(gameComponent.messageListener!=null)
-            gameComponent.messageListener.messageReceived(this,message,parameters);
+    public final void sendMessage(GameObject target,String message,Object... parameters) {
+        target.messageReceived(this.getGameObject(),message,parameters);
     }
 }

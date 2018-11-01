@@ -50,7 +50,7 @@ public class Editor implements GameMode,InputProcessor {
         this.engine=engine;
         inputMultiplexer=new InputMultiplexer();
         sr=new ShapeRenderer();
-        tileset=new Tileset(Gdx.files.internal("tileset2.xml"));
+        tileset=new Tileset(Gdx.files.internal("tileset.xml"));
         map=new Map(32,32,tileset);
         map.addLayer();
         tile=tileset.tiles.get(0);
@@ -120,7 +120,7 @@ public class Editor implements GameMode,InputProcessor {
     {
         tiles=new Dialog("Tiles",skin);
         tiles.setVisible(false);
-        tiles.setSize(240,320);
+        tiles.setSize(950,800);
         tiles.align(Align.topLeft);
         Table table=new Table(skin);
         TextButton close=new TextButton("Close",skin);
@@ -152,12 +152,12 @@ public class Editor implements GameMode,InputProcessor {
                 }
             });
             r++;
-            if(r<3)table.add(b).size(tilesize*2+30,tilesize*2+30).left();
+            if(r<10)table.add(b).size(tilesize*2+30,tilesize*2+30).left();
             else {table.add(b).size(tilesize*2+30,tilesize*2+30).left().row();r=0;}
             bt.add(b);
         }
         
-        tiles.add(table).row();
+        tiles.add(table).align(Align.topLeft).pad(0).row();
     }
     @Override
     public void update(float delta) {

@@ -52,12 +52,15 @@ public class Joint extends GameObject
     }
     public Array<GameObject> getAllGameObjects()
     {
-        Array<GameObject> gameObjects=new Array<GameObject>();
+        return getAllGameObjects(new Array<GameObject>());
+    }
+    public Array<GameObject> getAllGameObjects(Array<GameObject> gameObjects)
+    {
         for(int i=0;i<this.gameObjects.size;i++)
         {
             gameObjects.add(this.gameObjects.get(i));
-            if(gameObjects.get(i) instanceof Joint)
-                gameObjects.addAll(((Joint)this.gameObjects.get(i)).getAllGameObjects());
+            if(this.gameObjects.get(i) instanceof Joint)
+                ((Joint)this.gameObjects.get(i)).getAllGameObjects(gameObjects);
         }
         return gameObjects;
     }
@@ -88,6 +91,7 @@ public class Joint extends GameObject
     public final void addGameObject(GameObject toAdd)
     {
         gameObjects.add(toAdd);
+        toAdd.parent=this;
         toAdd.start();
     }
     

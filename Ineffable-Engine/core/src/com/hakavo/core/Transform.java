@@ -16,6 +16,7 @@
 
 package com.hakavo.core;
 import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.utils.Pools;
 
 public class Transform extends GameComponent {
     private Transform relative;
@@ -47,6 +48,12 @@ public class Transform extends GameComponent {
     
     public Matrix3 calculateMatrix(Matrix3 out) {
         return calculateMatrix(out,true);
+    }
+    public Vector2 getPosition(Vector2 out) {
+        Matrix3 mat=calculateMatrix(Pools.obtain(Matrix3.class));
+        mat.getTranslation(out);
+        Pools.free(mat);
+        return out;
     }
     private Matrix3 calculateMatrix(Matrix3 out,boolean identity)
     {

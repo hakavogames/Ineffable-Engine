@@ -91,4 +91,12 @@ public class AnimationController extends GameComponent
         if(currentAnim<animations.size)
             animations.get(currentAnim).resume();
     }
+    public boolean isPlaying() {
+        if(currentAnim<animations.size)
+            return animations.get(currentAnim).isPlaying();
+        return false;
+    }
+    public Animation getCurrentAnimation() {
+        return animations.get(currentAnim);
+    }
 }

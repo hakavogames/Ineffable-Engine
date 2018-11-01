@@ -18,11 +18,13 @@ package com.hakavo.core;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.utils.*;
 
-public class GameObject
+public class GameObject implements MessageListener
 {
     private boolean initialized=false;
     protected boolean dead=false;
+    protected Joint parent;
     public String name="default";
+    
     public final Array<GameComponent> components=new Array<GameComponent>();
     
     public final <T extends GameComponent> T getComponent(Class<T> type)
@@ -77,6 +79,8 @@ public class GameObject
     {
         this.components.add(component);
         component.setGameObject(this);
+        if(isInitialized())
+            component.start();
     }
     public final void addComponents(GameComponent... components)
     {
@@ -116,5 +120,15 @@ public class GameObject
     }
     public final void kill() {
         dead=true;
+    }
+    public final Joint getParent() {
+        return parent;
+    }
+
+    @Override
+    public void messageReceived(GameObject sender,String message,Object... parameters) {
+        for(GameComponent component : components)
+            if(component.getMessageListener()!=null)
+                component.getMessageListener().messageReceived(sender,message,parameters);
     }
 }
