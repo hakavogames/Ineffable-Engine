@@ -24,6 +24,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
+import com.hakavo.assets.AssetManager;
 import com.hakavo.core.collision.Collider;
 import com.hakavo.core.GameComponent;
 import java.util.Comparator;
@@ -35,6 +36,7 @@ public class Engine {
     private OrthographicCamera ui;
     public void init() {
         GameServices.init();
+        AssetManager.init();
         camera=new OrthographicCamera();
         camera.setToOrtho(false,400,225);
         ui=new OrthographicCamera();
