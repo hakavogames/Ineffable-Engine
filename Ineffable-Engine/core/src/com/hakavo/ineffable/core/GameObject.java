@@ -21,7 +21,7 @@ import com.badlogic.gdx.utils.*;
 public class GameObject implements MessageListener
 {
     private boolean initialized=false;
-    protected boolean dead=false;
+    protected boolean destroyed=false;
     protected Joint parent;
     public String name="default";
     
@@ -115,11 +115,15 @@ public class GameObject implements MessageListener
         return initialized;
     }
     
-    public final boolean isDead() {
-        return dead;
+    public final boolean isDestroyed() {
+        return destroyed;
     }
-    public final void kill() {
-        dead=true;
+    public void destroy() {
+        if(destroyed)return;
+        destroyed=true;
+        for(int i=0;i<this.components.size;i++)
+            components.get(i).onDestroy();
+        components.clear();
     }
     public final Joint getParent() {
         return parent;

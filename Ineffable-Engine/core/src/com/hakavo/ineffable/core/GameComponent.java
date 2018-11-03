@@ -40,6 +40,9 @@ public abstract class GameComponent
         target.messageReceived(this.getGameObject(),message,parameters);
     }
     
+    public void onDestroy() {
+    }
+    
     public static interface Copiable {
         public <T extends GameComponent> T cpy();
     }

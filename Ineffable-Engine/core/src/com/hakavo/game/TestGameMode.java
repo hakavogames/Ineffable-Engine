@@ -47,8 +47,9 @@ public class TestGameMode implements GameMode {
     public void init(Engine engine) {
         Tileset tileset=new Tileset(Gdx.files.internal("tileset.xml"));
         Sprite2D wall=tileset.tiles.get(tileset.getTileIndexByName("wall")).toSprite();
-        this.engine=engine; 
+        this.engine=engine;
         camera=engine.camera;
+        camera.setToOrtho(false,400,225);
         
         GameObject background=new GameObject();
         background.addComponent(new Transform());
@@ -89,7 +90,7 @@ public class TestGameMode implements GameMode {
         background.getComponent(Transform.class).matrix.translate(0,32);
         player.getComponent(SpriteRenderer.class).layer=2;
         //engine.level.addGameObject(background);
-        engine.level.addGameObject(player);
+        engine.getLevel().addGameObject(player);
         //engine.level.addGameObject(fire);
         
         Sprite2D l1=new Sprite2D(new TextureRegion(new Texture(Gdx.files.internal("parallax/mountain/trees1.png"))));
@@ -114,7 +115,7 @@ public class TestGameMode implements GameMode {
         bg.name="background";
         bg.addComponents(new Transform(0,0,0.4f,0.4f),p1,p2,p3,p4,p5,p6);
         
-        engine.level.addGameObject(bg);
+        engine.getLevel().addGameObject(bg);
     }
     public void initEnemy() {
         Sprite2D enemySprite=new Sprite2D();
@@ -148,8 +149,8 @@ public class TestGameMode implements GameMode {
         enemyClone.getComponent(SpriteRenderer.class).sprite=enemyCloneSprite;
         enemyClone.getComponent(AnimationController.class).setTarget(enemyCloneSprite);
         
-        engine.level.addGameObject(enemyClone);
-        engine.level.addGameObject(enemy);
+        engine.getLevel().addGameObject(enemyClone);
+        engine.getLevel().addGameObject(enemy);
     }
     public class EnemyBehaviour extends GameComponent implements GameComponent.Copiable {
         
@@ -165,7 +166,7 @@ public class TestGameMode implements GameMode {
         }
         public void update(float delta) {
             if(health<=0)
-                this.getGameObject().kill();
+                this.getGameObject().destroy();
         }
         public EnemyBehaviour cpy() {
             EnemyBehaviour eb=new EnemyBehaviour();
@@ -204,7 +205,7 @@ public class TestGameMode implements GameMode {
         public void update(float delta) {
             collider.setSize(spriteRenderer.sprite.textureRegion.getRegionWidth(),spriteRenderer.sprite.textureRegion.getRegionHeight());
             Vector2 position=new Vector2();
-            engine.level.getGameObjectByName("player").getComponent(Transform.class).getPosition(position);
+            engine.getLevel().getGameObjectByName("player").getComponent(Transform.class).getPosition(position);
             
             float dist=position.x-transform.getPosition(new Vector2()).x;
             
@@ -227,14 +228,14 @@ public class TestGameMode implements GameMode {
     @Override
     public void update(float delta) {
         Vector2 pos=Pools.obtain(Vector2.class);
-        GameObject player=engine.level.getGameObjectByName("player");
+        GameObject player=engine.getLevel().getGameObjectByName("player");
         if(player!=null)
             player.getComponent(Transform.class).matrix.getTranslation(pos);
         camera.position.set(pos.x,pos.y,0);
         Pools.free(pos);
     }
     @Override
-    public void render(OrthographicCamera ui) {
+    public void renderGui(OrthographicCamera ui) {
     }
 
     private static class Arrow extends GameObject {
@@ -274,13 +275,13 @@ public class TestGameMode implements GameMode {
                         if(gameObject.name.equals("zombie"))
                         {
                             getGameObject().getComponent(ArrowBehaviour.class).sendMessage(gameObject,"damage",30f);
-                            getGameObject().kill();
+                            getGameObject().destroy();
                         }
                     }
                 };
             }
             public void update(float delta) {
-                if(GameServices.getElapsedTime()-spawnTime>=lifespan){super.getGameObject().kill();return;}
+                if(GameServices.getElapsedTime()-spawnTime>=lifespan){super.getGameObject().destroy();return;}
                 
                 transform.matrix.translate(direction*400*delta,0);
             }

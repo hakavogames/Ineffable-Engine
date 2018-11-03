@@ -40,6 +40,9 @@ public class TextRenderer extends Renderable implements GameComponent.Copiable {
     public TextRenderer(String text) {
         this(text,new Color(0,0,0,1));
     }
+    public TextRenderer() {
+        this("");
+    }
     
     @Override
     public void start() {

@@ -30,29 +30,36 @@ import com.hakavo.ineffable.core.GameComponent;
 import java.util.Comparator;
 
 public class Engine {
-    public final Joint level=new Joint();
+    protected Joint level=new Joint();
     public OrthographicCamera camera;
     protected GameMode gameMode;
     private OrthographicCamera ui;
+    public void initServices() {
+    }
     public void init() {
         GameServices.init();
         AssetManager.init();
         camera=new OrthographicCamera();
-        camera.setToOrtho(false,400,225);
         ui=new OrthographicCamera();
         ui.setToOrtho(false,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         
+        Gdx.gl.glDisable(GL30.GL_DEPTH_TEST);
+        ShaderProgram.pedantic=false;
+    }
+    public void loadGameMode(GameMode gameMode) {
+        this.gameMode=gameMode;
+        level.destroy();
+        level=new Joint();
         level.addComponent(new GameManager());
         gameMode.init(this);
         level.start();
-        
-        Gdx.gl.glDisable(GL30.GL_DEPTH_TEST);
-        ShaderProgram.pedantic=false;
-        GameServices.resetTime();
+        level.update(0);
     }
-    public void setGameMode(GameMode gameMode)
-    {
-        this.gameMode=gameMode;
+    public Joint getLevel() {
+        return level;
+    }
+    public void setLevel(Joint level) {
+        this.level=level;
     }
     private Array<Renderable> renderList=new Array<Renderable>();
     public void render()
@@ -84,7 +91,7 @@ public class Engine {
                 renderable.onGui(ui);
         
         GameServices.spriteBatch.end();
-        gameMode.render(ui);
+        gameMode.renderGui(ui);
     }
     public void update(float delta)
     {

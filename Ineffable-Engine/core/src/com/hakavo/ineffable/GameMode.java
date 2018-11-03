@@ -22,5 +22,5 @@ public interface GameMode
 {
     public void init(Engine engine);
     public void update(float delta);
-    public void render(OrthographicCamera camera);
+    public void renderGui(OrthographicCamera camera);
 }

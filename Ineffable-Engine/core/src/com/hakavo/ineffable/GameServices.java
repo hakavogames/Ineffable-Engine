@@ -39,7 +39,7 @@ public class GameServices {
         startTime=TimeUtils.millis();
         
         fonts=new ArrayMap<String,BitmapFont>();
-        fonts.put("Consolas",createFont(Gdx.files.internal("fonts/pixeltype.ttf"),32));
+        fonts.put("pixeltype",createFont(Gdx.files.internal("fonts/pixeltype.ttf"),32));
         
         initPools();
         

@@ -209,7 +209,7 @@ public class Editor implements GameMode,InputProcessor {
         engine.camera.zoom=Interpolation.linear.apply(engine.camera.zoom,targetZoom,0.25f);
     }
     @Override
-    public void render(OrthographicCamera cam) {
+    public void renderGui(OrthographicCamera cam) {
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA,GL20.GL_ONE_MINUS_SRC_ALPHA);
         sr.begin(ShapeRenderer.ShapeType.Filled);

@@ -428,7 +428,7 @@ public class ExampleGameMode implements GameMode {
     }
 
     @Override
-    public void render(OrthographicCamera camera) {
+    public void renderGui(OrthographicCamera camera) {
         
     }
     

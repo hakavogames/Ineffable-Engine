@@ -108,7 +108,7 @@ public class Joint extends GameObject
         super.update(delta);
         for(int i=0;i<gameObjects.size;i++)
         {
-            if(gameObjects.get(i).isDead())
+            if(gameObjects.get(i).isDestroyed())
                 gameObjects.removeIndex(i);
             else gameObjects.get(i).update(delta);
         }
@@ -131,5 +131,13 @@ public class Joint extends GameObject
         for(int i=0;i<this.gameObjects.size;i++)
             joint.addGameObject(this.gameObjects.get(i).cpy());
         return joint;
+    }
+    @Override
+    public void destroy() {
+        if(destroyed)return;
+        super.destroy();
+        for(int i=0;i<this.gameObjects.size;i++)
+            this.gameObjects.get(i).destroy();
+        this.gameObjects.clear();
     }
 }

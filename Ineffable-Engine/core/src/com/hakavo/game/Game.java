@@ -8,6 +8,9 @@ import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.hakavo.ineffable.Engine;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Game extends ApplicationAdapter {
     Engine engine=new Engine();
@@ -16,8 +19,8 @@ public class Game extends ApplicationAdapter {
     public void create()
     {
         sb=new SpriteBatch();
-        engine.setGameMode(new TestGameMode());
         engine.init();
+        engine.loadGameMode(new MenuGameMode());
     }
     @Override
     public void render()
