@@ -4,19 +4,8 @@
   <auxiliary>
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-      <group>
-        <file>file:/A:/Documents/GitHub%20Desktp%20Repositories/Ineffable-Engine/Ineffable-Engine/core/src/com/hakavo/core/SoundLoader.java</file>
-        <file>file:/A:/Documents/GitHub%20Desktp%20Repositories/Ineffable-Engine/Ineffable-Engine/core/src/com/hakavo/Game.java</file>
-        <file>file:/A:/Documents/GitHub%20Desktp%20Repositories/Ineffable-Engine/Ineffable-Engine/core/src/com/hakavo/core/SpriteRenderer.java</file>
-        <file>file:/A:/Documents/GitHub%20Desktp%20Repositories/Ineffable-Engine/Ineffable-Engine/core/src/com/hakavo/Engine.java</file>
-        <file>file:/A:/Documents/GitHub%20Desktp%20Repositories/Ineffable-Engine/Ineffable-Engine/core/src/com/hakavo/GameMode.java</file>
-        <file>file:/A:/Documents/GitHub%20Desktp%20Repositories/Ineffable-Engine/Ineffable-Engine/core/src/com/hakavo/core/Joint.java</file>
-        <file>file:/A:/Documents/GitHub%20Desktp%20Repositories/Ineffable-Engine/Ineffable-Engine/core/src/com/hakavo/GameServices.java</file>
-      </group>
-    </open-files>
-    <editor-bookmarks lastBookmarkId="0" xmlns="http://www.netbeans.org/ns/editor-bookmarks/2"/>
-    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
       <group/>
     </open-files>
+    <editor-bookmarks lastBookmarkId="0" xmlns="http://www.netbeans.org/ns/editor-bookmarks/2"/>
   </auxiliary>
 </gradle-project-properties>
