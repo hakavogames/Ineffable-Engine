@@ -3,12 +3,13 @@ import com.hakavo.ineffable.core.GameComponent;
 
 public abstract class Collider extends GameComponent implements GameComponent.Copiable {
     protected boolean collisionState;
+    public boolean active=true;
     public CollisionAdapter collisionAdapter;
     
     protected abstract boolean collides(Collider collider);
     public void testCollision(Collider collider) {
         collisionState=collides(collider);
-        if(collisionAdapter!=null&&collisionState==true)
+        if(collisionAdapter!=null&&collisionState==true&&active)
             collisionAdapter.onCollision(collider.getGameObject());
     }
     @Override

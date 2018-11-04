@@ -20,7 +20,7 @@ public class Game extends ApplicationAdapter {
     {
         sb=new SpriteBatch();
         engine.init();
-        engine.loadGameMode(new MenuGameMode());
+        engine.loadGameMode(new DebugGameMode());
     }
     @Override
     public void render()

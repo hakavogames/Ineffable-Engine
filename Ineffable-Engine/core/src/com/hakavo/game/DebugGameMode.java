@@ -25,15 +25,12 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.*;
-import com.badlogic.gdx.utils.Pools;
-import com.hakavo.ineffable.Engine;
-import com.hakavo.ineffable.GameMode;
-import com.hakavo.ineffable.GameServices;
-import com.hakavo.ineffable.Tileset;
+import com.badlogic.gdx.utils.*;
+import com.hakavo.game.mechanics.*;
+import com.hakavo.game.mechanics.DialogueSystem.Dialogue;
+import com.hakavo.ineffable.*;
+import com.hakavo.ineffable.core.*;
 import com.hakavo.ineffable.core.GameComponent.Copiable;
-import com.hakavo.ineffable.core.ParticleSystem.Particle;
-import java.io.IOException;
-import java.util.logging.*;
 
 public class DebugGameMode implements GameMode {
     Map map;
@@ -67,12 +64,23 @@ public class DebugGameMode implements GameMode {
         Animation fart=new Animation("fart",clip2,sprite);
         AnimationController animationController=new AnimationController(sprite,idle,fart);
         
-        GameObject player=new GameObject();
+        Joint player=new Joint();
         player.name="player";
         player.addComponent(new Transform(camera.viewportWidth/2,camera.viewportHeight/2));
         player.addComponent(new SpriteRenderer(sprite));
         player.addComponent(idle);
         player.getComponent(SpriteRenderer.class).layer=2;
+        
+        DialogueSystem dialogueSystem=new DialogueSystem(true,clip1.frames.get(0).getRegionWidth()/2,1);
+        dialogueSystem.dialogues.addLast(new Dialogue("Hi, I'm Gelu.",2,false));
+        dialogueSystem.dialogues.addLast(new Dialogue("I am a trashman.",2,false));
+        dialogueSystem.dialogues.addLast(new Dialogue("I like trains",4,false));
+        
+        GameObject text=new GameObject();
+        text.addComponent(new Transform(0,50,0.3f,0.3f).setRelative(player.getComponent(Transform.class)));
+        text.addComponent(new TextRenderer("",new Color(1,1,1,1)));
+        text.addComponent(dialogueSystem);
+        player.addGameObject(text);
         
         idle.play();
         engine.getLevel().addGameObject(player);
