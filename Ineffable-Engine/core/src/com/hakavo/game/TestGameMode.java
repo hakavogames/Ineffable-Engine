@@ -185,18 +185,18 @@ public class TestGameMode implements GameMode {
             animController=this.getGameObject().getComponent(AnimationController.class);
             spriteRenderer=this.getGameObject().getComponent(SpriteRenderer.class);
             collider=this.getGameObject().getComponent(BoxCollider.class);
-            collider.collisionAdapter=new CollisionAdapter() {
+            collider.setCollisionAdapter(new CollisionAdapter() {
                 @Override
-                public void onCollision(GameObject gameObject) {
+                public void onCollision(Collider collider) {
                     if(gameObject.name.equals("player"))
                     {
-                        TextRenderer tr=((Joint)gameObject).gameObjects.get(0).getComponent(TextRenderer.class);
+                        TextRenderer tr=((Joint)collider.getGameObject()).gameObjects.get(0).getComponent(TextRenderer.class);
                         tr.text="";
                         for(int i=0;i<10;i++)
                             tr.text+=(char)MathUtils.random(255);
                     }
                 }
-            };
+            });
             spriteRenderer.layer=3;
             
             animController.play("idle");
@@ -269,16 +269,16 @@ public class TestGameMode implements GameMode {
                 collider=super.getGameObject().getComponent(BoxCollider.class);
                 spawnTime=GameServices.getElapsedTime();
                 
-                collider.collisionAdapter=new CollisionAdapter() {
+                collider.setCollisionAdapter(new CollisionAdapter() {
                     @Override
-                    public void onCollision(GameObject gameObject) {
+                    public void onCollision(Collider collider) {
                         if(gameObject.name.equals("zombie"))
                         {
-                            getGameObject().getComponent(ArrowBehaviour.class).sendMessage(gameObject,"damage",30f);
+                            getGameObject().getComponent(ArrowBehaviour.class).sendMessage(collider.getGameObject(),"damage",30f);
                             getGameObject().destroy();
                         }
                     }
-                };
+                });
             }
             public void update(float delta) {
                 if(GameServices.getElapsedTime()-spawnTime>=lifespan){super.getGameObject().destroy();return;}

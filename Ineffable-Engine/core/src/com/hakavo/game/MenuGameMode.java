@@ -25,7 +25,12 @@ public class MenuGameMode implements GameMode {
         main.addComponent(new TextRenderer());
         main.addComponent(new IntroBehaviour());
         
+        GameObject tip=new GameObject();
+        tip.addComponent(new Transform(15,25,1,1));
+        tip.addComponent(new TextRenderer("Press ESC to skip",new Color(0.3f,0.3f,0.3f,1)));
+        
         engine.getLevel().addGameObject(main);
+        engine.getLevel().addGameObject(tip);
     }
     @Override
     public void update(float delta) {
@@ -74,14 +79,17 @@ public class MenuGameMode implements GameMode {
                 else alpha=interp.apply(1,0,(f*2f-1f));
                 textRenderer.color.set(title.r,title.g,title.b,alpha);
             }
-            else {
-                this.getGameObject().getParent().destroy();
-                engine.loadGameMode(new TestGameMode());
-            }
+            else finishIntro();
+            
+            if(Gdx.input.isKeyJustPressed(Keys.ESCAPE))finishIntro();
             
             transform.matrix.idt();
             transform.matrix.translate(800f-getTextWidth(textRenderer.text)*fontScale/2f,450f+getTextHeight()*fontScale/2f);
             transform.matrix.scale(fontScale,fontScale);
+        }
+        public void finishIntro() {
+            this.getGameObject().getParent().destroy();
+            engine.loadGameMode(new DebugGameMode());
         }
         public float getTextWidth(String text) {
             layout.setText(textRenderer.font,text);

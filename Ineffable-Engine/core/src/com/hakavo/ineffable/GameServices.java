@@ -21,13 +21,14 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.graphics.glutils.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.*;
 import java.util.Random;
 
 public class GameServices {
     protected static SpriteBatch spriteBatch;
+    protected static ShapeRenderer shapeRenderer;
     protected static ShaderProgram defaultShader;
     protected static ArrayMap<String,BitmapFont> fonts;
     private static long startTime;
@@ -36,6 +37,7 @@ public class GameServices {
     {
         MathUtils.random=new Random();
         spriteBatch=new SpriteBatch();
+        shapeRenderer=new ShapeRenderer();
         startTime=TimeUtils.millis();
         
         fonts=new ArrayMap<String,BitmapFont>();
@@ -90,6 +92,9 @@ public class GameServices {
     }
     public static ShaderProgram getDefaultShader() {
         return defaultShader;
+    }
+    public static ShapeRenderer getShapeRenderer() {
+        return shapeRenderer;
     }
     public static float getElapsedTime()
     {

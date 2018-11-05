@@ -35,6 +35,13 @@ public class Joint extends GameObject
                 return (T)gameObjects.get(i);
         return null;
     }
+    public <T extends GameObject> T findGameObjectByName(String name)
+    {
+        for(GameObject gameObject : getAllGameObjects())
+            if(gameObject.name.equals(name))
+                return (T)gameObject;
+        return null;
+    }
     public <T extends GameObject> Array<T> getGameObjects(Class<T> type)
     {
         Array<T> array=new Array<T>();
@@ -56,6 +63,7 @@ public class Joint extends GameObject
     }
     public Array<GameObject> getAllGameObjects(Array<GameObject> gameObjects)
     {
+        gameObjects.add(this);
         for(int i=0;i<this.gameObjects.size;i++)
         {
             gameObjects.add(this.gameObjects.get(i));
@@ -131,6 +139,11 @@ public class Joint extends GameObject
         for(int i=0;i<this.gameObjects.size;i++)
             joint.addGameObject(this.gameObjects.get(i).cpy());
         return joint;
+    }
+    @Override
+    public Joint getLevel() {
+        if(parent==null)return this;
+        return parent.getParent();
     }
     @Override
     public void destroy() {

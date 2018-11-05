@@ -8,9 +8,9 @@ import java.io.IOException;
 public class DesktopLauncher {
 	public static void main (String[] arg) throws IOException {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-                config.width=1600;
-                config.height=900;
-                config.fullscreen=false;
+                config.width=1920;
+                config.height=1080;
+                config.fullscreen=true;
                 config.useGL30=true;
                 config.foregroundFPS=10000;
                 config.allowSoftwareMode=false;

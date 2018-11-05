@@ -27,7 +27,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.*;
 import com.hakavo.game.mechanics.*;
-import com.hakavo.game.mechanics.DialogueSystem.Dialogue;
+import com.hakavo.game.mechanics.DialogueSystem.*;
 import com.hakavo.ineffable.*;
 import com.hakavo.ineffable.core.*;
 import com.hakavo.ineffable.core.GameComponent.Copiable;
@@ -35,7 +35,7 @@ import com.hakavo.ineffable.core.GameComponent.Copiable;
 public class DebugGameMode implements GameMode {
     Map map;
     OrthographicCamera camera;
-    Engine engine;
+    static Engine engine;
     Tileset poses;
     
     public DebugGameMode() {
@@ -44,8 +44,11 @@ public class DebugGameMode implements GameMode {
     public void init(Engine engine) {
         Tileset tileset=new Tileset(Gdx.files.internal("tileset.xml"));
         this.engine=engine;
+        engine.camera=new OrthographicCamera();
         camera=engine.camera;
         camera.setToOrtho(false,400,225);
+        camera.zoom=0.5f;
+        camera.position.add(12f,12f,0);
         
         Sprite2D sprite=new Sprite2D();
         
@@ -63,34 +66,106 @@ public class DebugGameMode implements GameMode {
         Animation idle=new Animation("idle",clip1,sprite);
         Animation fart=new Animation("fart",clip2,sprite);
         AnimationController animationController=new AnimationController(sprite,idle,fart);
+        animationController.play("idle");
         
         Joint player=new Joint();
         player.name="player";
         player.addComponent(new Transform(camera.viewportWidth/2,camera.viewportHeight/2));
         player.addComponent(new SpriteRenderer(sprite));
-        player.addComponent(idle);
+        player.addComponent(animationController);
         player.getComponent(SpriteRenderer.class).layer=2;
         
-        DialogueSystem dialogueSystem=new DialogueSystem(true,clip1.frames.get(0).getRegionWidth()/2,1);
-        dialogueSystem.dialogues.addLast(new Dialogue("Hi, I'm Gelu.",2,false));
-        dialogueSystem.dialogues.addLast(new Dialogue("I am a trashman.",2,false));
-        dialogueSystem.dialogues.addLast(new Dialogue("I like trains",4,false));
+        Dialogue greeting=new Dialogue("greeting","Hello, I'm a trashman.",4);
+        Dialogue greeting2=new Dialogue("greeting2","People there call me Gelu.",3);
+        Dialogue question=new Dialogue("question","Can you give me some money for cigarettes?",1.5f);
+        Dialogue answer1=new Dialogue("answer-yes","Thanx kid",2) {
+            @Override
+            public void onDialogueComplete() {
+                GameObject player=DebugGameMode.engine.getLevel().findGameObjectByName("player");
+                player.addComponent(new GameComponent() {
+                    Transform transform;
+                    public void start() {
+                        transform=getGameObject().getComponent(Transform.class);
+                        getGameObject().getComponent(AnimationController.class).play("fart");
+                    }
+                    public void update(float delta) {
+                        transform.matrix.translate(delta*50,0);
+                    }
+                });
+            }
+        };
+        Dialogue answer2=new Dialogue("answer-no","Screw you",2) {
+            @Override
+            public void onDialogueComplete() {
+                GameObject player=DebugGameMode.engine.getLevel().findGameObjectByName("player");
+                player.getComponent(SpriteRenderer.class).color.set(1,0.2f,0,1);
+            }
+        };
+        Dialogue threaten=new Dialogue("threaten","Tomorrow I'll get my brothers and hunt you down",4.5f) {
+            @Override
+            public void onDialogueComplete() {
+                GameObject player=DebugGameMode.engine.getLevel().findGameObjectByName("player");
+                player.addComponent(new GameComponent() {
+                    Transform transform;
+                    @Override
+                    public void start() {
+                        transform=getGameObject().getComponent(Transform.class);
+                    }
+                    @Override
+                    public void update(float delta) {
+                        transform.matrix.translate(16,16);
+                        transform.matrix.scale(1f+delta*4.3f,1f+delta*4.3f);
+                        transform.matrix.translate(-16,-16);
+                    }
+                });
+            }
+        };
+        
+        answer2.choices.add(new Choice("","threaten"));
+        greeting.choices.add(new Choice("","greeting2"));
+        greeting2.choices.add(new Choice("","question"));
+        question.choices.add(new Choice("Here, take this 5$ note.","answer-yes"));
+        question.choices.add(new Choice("No.","answer-no"));
+        question.choices.add(new Choice("Teleport Gelu away","exit") {
+            @Override
+            public void onChoose() {
+                GameObject player=DebugGameMode.engine.getLevel().findGameObjectByName("player");
+                player.addComponent(new GameComponent() {
+                    SpriteRenderer spriteRenderer;
+                    public void start() {
+                        spriteRenderer=getGameObject().getComponent(SpriteRenderer.class);
+                    }
+                    public void update(float delta) {
+                        spriteRenderer.color.a-=delta*0.3f;
+                        if(spriteRenderer.color.a<=0)
+                            getGameObject().destroy();
+                    }
+                });
+            }
+        });
+        
+        DialogueSystem dialogueSystem=new DialogueSystem(true,clip1.frames.get(0).getRegionWidth()/2,0.3f,0.6f);
+        dialogueSystem.dialogues.addAll(greeting,greeting2,question,answer1,answer2,threaten);
         
         GameObject text=new GameObject();
-        text.addComponent(new Transform(0,50,0.3f,0.3f).setRelative(player.getComponent(Transform.class)));
+        text.addComponent(new Transform(0,40,1f,1f).setRelative(player.getComponent(Transform.class)));
         text.addComponent(new TextRenderer("",new Color(1,1,1,1)));
         text.addComponent(dialogueSystem);
         player.addGameObject(text);
         
         idle.play();
         engine.getLevel().addGameObject(player);
+        dialogueSystem.setDialogue("greeting");
     }
     @Override
     public void update(float delta) {
-        GameObject player=engine.getLevel().getGameObjectByName("player");
-        player.getComponent(Animation.class).update(delta);
+        if(Gdx.input.isKeyJustPressed(Keys.R))
+            engine.loadGameMode(new DebugGameMode());
     }
     @Override
     public void renderGui(OrthographicCamera camera) {
+        BitmapFont font=GameServices.getFonts().get("pixeltype");
+        font.setColor(1,1,1,1);
+        font.draw(GameServices.getSpriteBatch(),"Press R to reset",15,25);
     }
 }

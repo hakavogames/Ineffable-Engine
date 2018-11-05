@@ -21,12 +21,13 @@ import com.hakavo.ineffable.core.GameObject;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Pools;
+import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.math.collision.Ray;
+import com.badlogic.gdx.utils.*;
 import com.hakavo.ineffable.assets.AssetManager;
 import com.hakavo.ineffable.core.collision.Collider;
 import com.hakavo.ineffable.core.GameComponent;
+import com.hakavo.ineffable.core.collision.PointCollider;
 import java.util.Comparator;
 
 public class Engine {
@@ -90,8 +91,8 @@ public class Engine {
             if(renderable.visible)
                 renderable.onGui(ui);
         
-        GameServices.spriteBatch.end();
         gameMode.renderGui(ui);
+        GameServices.spriteBatch.end();
     }
     public void update(float delta)
     {
@@ -103,16 +104,25 @@ public class Engine {
     private class GameManager extends GameComponent {
         private Joint level;
         private Array<GameObject> gameObjects;
+        private PointCollider cursor;
         
         @Override
         public void start() {
+            cursor=new PointCollider();
+            cursor.active=false;
+            cursor.name="mouse-pointer";
+            
             level=(Joint)this.getGameObject();
+            level.addComponent(cursor);
             gameObjects=new Array<GameObject>();
         }
         @Override
         public void update(float delta) {
-            gameObjects.clear();
+            Ray ray=camera.getPickRay(Gdx.input.getX(),Gdx.input.getY());
+            cursor.setPosition(ray.origin.x,ray.origin.y);
+            cursor.active=Gdx.input.isButtonPressed(Input.Buttons.LEFT);
             
+            gameObjects.clear();
             Array<Collider> colliders=new Array<Collider>();
             
             for(GameObject gameObject : level.getAllGameObjects(gameObjects))
@@ -120,10 +130,8 @@ public class Engine {
             
             for(Collider collider : colliders)
                 for(int i=0;i<colliders.size;i++)
-                {
                     if(!colliders.get(i).equals(collider))
                         collider.testCollision(colliders.get(i));
-                }
         }
     }
 }

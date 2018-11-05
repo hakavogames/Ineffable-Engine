@@ -2,10 +2,11 @@ package com.hakavo.ineffable.core.collision;
 import com.hakavo.ineffable.core.GameObject;
 
 public class CollisionAdapter {
-    public void onCollision(GameObject target) {
+    public Collider parent;
+    public void onCollision(Collider target) {
     }
-    public void onCollisionEnter(GameObject target) {
+    public void onCollisionEnter(Collider target) {
     }
-    public void onCollisionExit(GameObject target) {
+    public void onCollisionExit(Collider target) {
     }
 }

@@ -21,6 +21,7 @@ public abstract class GameComponent
     protected GameObject gameObject;
     protected MessageListener messageListener;
     public String name="";
+    public Object userData;
     
     public <T extends GameComponent> void copyFrom(T copyFrom) {
         this.gameObject=copyFrom.gameObject;
@@ -38,6 +39,9 @@ public abstract class GameComponent
     
     public final void sendMessage(GameObject target,String message,Object... parameters) {
         target.messageReceived(this.getGameObject(),message,parameters);
+    }
+    public final void sendMessage(String gameObjectName,String message,Object... parameters) {
+        gameObject.getLevel().findGameObjectByName(gameObjectName).messageReceived(this.gameObject,message,parameters);
     }
     
     public void onDestroy() {
