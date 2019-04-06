@@ -67,7 +67,7 @@ public class ParticleSystem extends Renderable implements GameComponent.Copiable
             Matrix4 mat4=Pools.obtain(Matrix4.class);
             mat.idt();
             if(isTransformDependent)transform.calculateMatrix(mat);
-            mat.translate(particle.position).scale(particle.scale);
+            mat.translate(particle.position).scale(particle.scale).translate(tr.getRegionWidth()/2f,tr.getRegionHeight()/2f);
             sb.setTransformMatrix(mat4.set(mat));
             sb.draw(tr,tr.getRegionWidth(),tr.getRegionHeight());
             Pools.free(mat);

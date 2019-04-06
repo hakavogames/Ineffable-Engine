@@ -1,5 +1,7 @@
 package com.hakavo.game;
 
+
+
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.hakavo.ineffable.*;
 import com.hakavo.ineffable.core.collision.*;
@@ -14,11 +16,15 @@ import com.badlogic.gdx.utils.Queue;
 
 public class MenuGameMode implements GameMode {
     Engine engine;
+    private GameMode after;
     
+    public MenuGameMode(GameMode onFinish) {
+        after=onFinish;
+    }
     @Override
     public void init(Engine engine) {
         this.engine=engine;
-        engine.camera.setToOrtho(false,1600,900);
+        engine.camera.setToOrtho(false,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         
         GameObject main=new GameObject();
         main.addComponent(new Transform());
@@ -89,7 +95,7 @@ public class MenuGameMode implements GameMode {
         }
         public void finishIntro() {
             this.getGameObject().getParent().destroy();
-            engine.loadGameMode(new DebugGameMode());
+            engine.loadGameMode(after);
         }
         public float getTextWidth(String text) {
             layout.setText(textRenderer.font,text);

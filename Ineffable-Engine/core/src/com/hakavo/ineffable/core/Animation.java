@@ -41,6 +41,8 @@ public class Animation extends GameComponent implements GameComponent.Copiable
     }
     @Override
     public void update(float delta) {
+        if(target==null&&gameObject.getComponent(SpriteRenderer.class)!=null)
+            setTarget(gameObject.getComponent(SpriteRenderer.class).sprite);
         float d=currentTime-startTime;
         float f=clip.duration/clip.frames.size;
         

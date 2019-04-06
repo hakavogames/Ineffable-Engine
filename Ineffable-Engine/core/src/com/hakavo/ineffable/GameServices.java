@@ -41,13 +41,14 @@ public class GameServices {
         startTime=TimeUtils.millis();
         
         fonts=new ArrayMap<String,BitmapFont>();
-        fonts.put("pixeltype",createFont(Gdx.files.internal("fonts/pixeltype.ttf"),32));
+        fonts.put("pixeltype",createFont(Gdx.files.internal("fonts/pixeltype2.ttf"),32));
+        fonts.getValueAt(0).getData().markupEnabled=false;
         
         initPools();
         
-        defaultShader=new ShaderProgram(Gdx.files.internal("shaders/default.vert"),Gdx.files.internal("shaders/default.frag"));
+        /*defaultShader=new ShaderProgram(Gdx.files.internal("shaders/default.vert"),Gdx.files.internal("shaders/default.frag"));
         if(!defaultShader.isCompiled())
-            throw new GdxRuntimeException(defaultShader.getLog());
+            throw new GdxRuntimeException(defaultShader.getLog());*/
     }
     private static void initPools()
     {

@@ -3,6 +3,7 @@ package com.hakavo.ineffable.core.collision;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Pools;
 import com.hakavo.ineffable.core.Transform;
+import com.hakavo.ineffable.gameobjects.Map;
 
 public class PointCollider extends Collider {
     public Transform transform;
@@ -25,6 +26,9 @@ public class PointCollider extends Collider {
     public float getTransformedY() {
         return position.y;
     }
+    public float getVolume() {
+        return 1f;
+    }
     
     @Override
     public void start() {
@@ -41,16 +45,22 @@ public class PointCollider extends Collider {
         }
     }
     @Override
+    public Vector2 getNormal(Collider collider,Vector2 out) {
+        return out.set(0,0);
+    }
+    @Override
     public PointCollider cpy() {
         PointCollider pc=new PointCollider(this.x,this.y);
         pc.copyFrom(this);
         return pc;
     }
     @Override
-    protected boolean collides(Collider collider) {
+    public boolean collides(Collider collider) {
         if(collider instanceof BoxCollider)
             return ((BoxCollider)collider).contains(getTransformedX(),getTransformedY(),0,0);
         else if(collider instanceof CircleCollider)
+            return collider.collides(this);
+        else if(collider instanceof Map.MapCollider)
             return collider.collides(this);
         
         return false;
@@ -60,4 +70,5 @@ public class PointCollider extends Collider {
     public String toString() {
         return "["+getTransformedX()+","+getTransformedY()+"]";
     }
+
 }

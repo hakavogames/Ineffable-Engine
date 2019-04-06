@@ -55,6 +55,12 @@ public class Transform extends GameComponent implements GameComponent.Copiable {
         Pools.free(mat);
         return out;
     }
+    public Vector2 getScale(Vector2 out) {
+        Matrix3 mat=calculateMatrix(Pools.obtain(Matrix3.class));
+        mat.getScale(out);
+        Pools.free(mat);
+        return out;
+    }
     private Matrix3 calculateMatrix(Matrix3 out,boolean identity)
     {
         if(identity)out.idt();

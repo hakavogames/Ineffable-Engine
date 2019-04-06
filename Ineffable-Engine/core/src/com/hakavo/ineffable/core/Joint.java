@@ -21,6 +21,13 @@ import com.badlogic.gdx.utils.*;
 public class Joint extends GameObject
 {
     public Array<GameObject> gameObjects=new Array<GameObject>();
+    
+    public Joint() {
+    }
+    public Joint(String name) {
+        super.name=name;
+    }
+    
     public <T extends GameObject> T getGameObject(Class type)
     {
         for(int i=0;i<gameObjects.size;i++)
@@ -143,14 +150,14 @@ public class Joint extends GameObject
     @Override
     public Joint getLevel() {
         if(parent==null)return this;
-        return parent.getParent();
+        return parent.getLevel();
     }
     @Override
     public void destroy() {
         if(destroyed)return;
-        super.destroy();
         for(int i=0;i<this.gameObjects.size;i++)
             this.gameObjects.get(i).destroy();
         this.gameObjects.clear();
+        super.destroy();
     }
 }

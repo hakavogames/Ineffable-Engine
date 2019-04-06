@@ -21,26 +21,30 @@ import com.hakavo.ineffable.core.GameObject;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.utils.*;
 import com.hakavo.ineffable.assets.AssetManager;
-import com.hakavo.ineffable.core.collision.Collider;
-import com.hakavo.ineffable.core.GameComponent;
-import com.hakavo.ineffable.core.collision.PointCollider;
+import com.hakavo.ineffable.core.collision.*;
+import com.hakavo.ineffable.core.*;
+import com.hakavo.ineffable.core.physics.*;
+import com.hakavo.ineffable.rendering.*;
 import java.util.Comparator;
 
 public class Engine {
     protected Joint level=new Joint();
-    public OrthographicCamera camera;
     protected GameMode gameMode;
+    protected Renderer renderer;
+    public OrthographicCamera camera;
     private OrthographicCamera ui;
-    public void initServices() {
-    }
-    public void init() {
+    private void initServices() {
         GameServices.init();
         AssetManager.init();
+    }
+    public void init() {
+        initServices();
         camera=new OrthographicCamera();
+        renderer=new Renderer(this);
+        renderer.init();
         ui=new OrthographicCamera();
         ui.setToOrtho(false,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         
@@ -50,19 +54,27 @@ public class Engine {
     public void loadGameMode(GameMode gameMode) {
         this.gameMode=gameMode;
         level.destroy();
-        level=new Joint();
-        level.addComponent(new GameManager());
+        level=createLevel();
         gameMode.init(this);
         level.start();
         level.update(0);
     }
+    public Joint createLevel() {
+        Joint out=new Joint();
+        out.addComponent(new GameManager());
+        out.addComponent(new PhysicsWorld());
+        return out;
+    }
     public Joint getLevel() {
         return level;
+    }
+    public Renderer getRenderer() {
+        return this.renderer;
     }
     public void setLevel(Joint level) {
         this.level=level;
     }
-    private Array<Renderable> renderList=new Array<Renderable>();
+    private final Array<Renderable> renderList=new Array<Renderable>();
     public void render()
     {
         renderList.clear();
@@ -74,25 +86,18 @@ public class Engine {
                 return ((Renderable)o2).layer-((Renderable)o1).layer;
             }
         });
+        renderer.render(renderList);
         
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        GameServices.getSpriteBatch().setShader(null);
         GameServices.spriteBatch.begin();
-        GameServices.spriteBatch.setShader(GameServices.getDefaultShader());
-        
-        for(Renderable renderable : renderList)
-            if(renderable.visible)
-                renderable.render(camera);
-        
         GameServices.spriteBatch.setProjectionMatrix(ui.combined);
-        Matrix4 mat=Pools.obtain(Matrix4.class).idt();
-        GameServices.spriteBatch.setTransformMatrix(mat);
-        Pools.free(mat);
         for(Renderable renderable : renderList)
             if(renderable.visible)
                 renderable.onGui(ui);
         
         gameMode.renderGui(ui);
-        GameServices.spriteBatch.end();
+        if(GameServices.spriteBatch.isDrawing())
+            GameServices.spriteBatch.end();
     }
     public void update(float delta)
     {
@@ -101,16 +106,18 @@ public class Engine {
         camera.update();
         GameServices.getSpriteBatch().setProjectionMatrix(camera.combined);
     }
-    private class GameManager extends GameComponent {
+    public class GameManager extends GameComponent {
         private Joint level;
         private Array<GameObject> gameObjects;
         private PointCollider cursor;
+        private Array<Collider> colliders=new Array<Collider>();
         
         @Override
         public void start() {
             cursor=new PointCollider();
             cursor.active=false;
             cursor.name="mouse-pointer";
+            cursor.tags.set(0,-1);
             
             level=(Joint)this.getGameObject();
             level.addComponent(cursor);
@@ -123,8 +130,7 @@ public class Engine {
             cursor.active=Gdx.input.isButtonPressed(Input.Buttons.LEFT);
             
             gameObjects.clear();
-            Array<Collider> colliders=new Array<Collider>();
-            
+            colliders.clear();
             for(GameObject gameObject : level.getAllGameObjects(gameObjects))
                 colliders.addAll(gameObject.getComponents(Collider.class));
             
@@ -132,6 +138,16 @@ public class Engine {
                 for(int i=0;i<colliders.size;i++)
                     if(!colliders.get(i).equals(collider))
                         collider.testCollision(colliders.get(i));
+        }
+        public Array<Collider> testCollision(Collider collider) {
+            Array<Collider> objectsHit=new Array<Collider>();
+            
+            for(Collider t : colliders)
+                if(!t.equals(collider))
+                    if(t.active&&collider.active&&collider.matchTags(t)&&t.collides(collider))
+                        objectsHit.add(t);
+            
+            return objectsHit;
         }
     }
 }

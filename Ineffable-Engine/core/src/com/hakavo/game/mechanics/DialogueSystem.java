@@ -22,7 +22,6 @@ public class DialogueSystem extends Renderable {
     private GlyphLayout layout;
     private Transform transform;
     private Matrix3 initialTransform=new Matrix3();
-    private Array<BoxCollider> buttons=new Array<BoxCollider>();
     private float timeline;
     
     private Dialogue currentDialogue;
@@ -39,27 +38,36 @@ public class DialogueSystem extends Renderable {
     @Override
     public void update(float delta) {
         timeline+=delta;
+        
         float fontScale=config.textScale;
-        if(currentDialogue!=null&&timeline>=currentDialogue.duration&&!currentDialogue.hasChoices())
-        {
-            currentDialogue.onDialogueComplete();
-            if(currentDialogue.choices.size==0)setDialogue(null);
-            else setDialogue(currentDialogue.choices.get(0).nextDialogue);
-            timeline=0;
-        }
-        else if(currentDialogue!=null)
+        if(isDialoguePresent())
         {
             textRenderer.text=currentDialogue.text;
             if(currentDialogue.hasChoices())timeline=Math.min(timeline,currentDialogue.duration/2f);
             
             float alpha=0,f=timeline/currentDialogue.duration,decayTime=0.85f;
             
-            if(f<decayTime)
-                alpha=Interpolation.pow5.apply(0,1,f*(1f/decayTime));
-            else alpha=Interpolation.pow2.apply(1,0,(f-decayTime)/(1f-decayTime));
+            if(f<decayTime/4f)
+                alpha=Interpolation.pow5.apply(0,1,f*(1f/(decayTime/4f)));
+            else if(f>=decayTime)
+                alpha=Interpolation.pow2.apply(1,0,(f-decayTime)/(1f-decayTime));
+            else alpha=1;
             if(currentDialogue.scaleFont)fontScale+=Math.max(f-decayTime,0)*(config.fadeOutScale-config.textScale);
             textRenderer.color.set(currentDialogue.r,currentDialogue.g,currentDialogue.b,alpha);
             if(f<decayTime)transform.calculateMatrix(initialTransform);
+            
+            if(timeline>=currentDialogue.duration)
+            {
+                if(currentDialogue.choices.size==0) {
+                    currentDialogue.onDialogueComplete();
+                    setDialogue(null);
+                }
+                else if(currentDialogue.choices.size==1)
+                    chooseDialogue(currentDialogue.choices.get(0));
+            }
+        }
+        else {
+            textRenderer.color.a=0;
         }
         
         Vector2 position=Pools.obtain(Vector2.class);
@@ -72,34 +80,42 @@ public class DialogueSystem extends Renderable {
         
         Pools.free(position);
     }
+    private boolean isDialoguePresent() {
+        return currentDialogue!=null;
+    }
     private void chooseDialogue(Choice choice) {
-        currentDialogue=findDialogue(choice.nextDialogue);
+        if(currentDialogue!=null)currentDialogue.onDialogueComplete();
         choice.onChoose();
+        setDialogue(choice.nextDialogue);
+    }
+    public void onConversationFinish() {
     }
     public void setDialogue(String name) {
-        this.getGameObject().components.removeAll(buttons,false);
-        buttons.clear();
+        this.getGameObject().removeComponent(BoxCollider.class,true);
+        timeline=0;
         currentDialogue=findDialogue(name);
-        if(currentDialogue==null)return;
+        if(currentDialogue==null||!currentDialogue.hasChoices()) {
+            if(currentDialogue==null)onConversationFinish();
+            return;
+        }
         
         float maxLineWidth=getTextWidth(currentDialogue.text),lineHeight=textRenderer.font.getLineHeight();
         for(int i=0;i<currentDialogue.choices.size;i++)
             maxLineWidth=Math.max(maxLineWidth,getTextWidth(currentDialogue.choices.get(i).text));
-        
         for(int i=0;i<currentDialogue.choices.size;i++)
         {
             Choice choice=currentDialogue.choices.get(i);
             BoxCollider box=new BoxCollider(0,-lineHeight*(i+2)-5,maxLineWidth,lineHeight);
             box.userData=choice;
+            box.tags.add(-1);
             box.setCollisionAdapter(new CollisionAdapter() {
                 @Override
-                public void onCollisionEnter(Collider target) {
+                public void onCollision(Collider target) {
                     if(target.name.equals("mouse-pointer"))
                         chooseDialogue((Choice)parent.userData);
                 }
             });
             this.getGameObject().addComponent(box);
-            buttons.add(box);
         }
     }
     private float getTextWidth(String text) {
@@ -183,6 +199,9 @@ public class DialogueSystem extends Renderable {
         public Choice(String text,String nextDialogue) {
             this.text=text;
             this.nextDialogue=nextDialogue;
+        }
+        public Choice(String nextDialogue) {
+            this("default",nextDialogue);
         }
         public void onChoose() {
         }

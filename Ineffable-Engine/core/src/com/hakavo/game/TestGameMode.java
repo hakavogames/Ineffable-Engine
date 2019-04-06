@@ -1,3 +1,5 @@
+package com.hakavo.game;
+
 /*
  * Copyright 2018 .
  *
@@ -14,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.hakavo.game;
+
 import com.hakavo.ineffable.core.collision.*;
 import com.hakavo.ineffable.core.*;
 import com.hakavo.ineffable.gameobjects.Map;

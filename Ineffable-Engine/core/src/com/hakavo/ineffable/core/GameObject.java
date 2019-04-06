@@ -27,6 +27,15 @@ public class GameObject implements MessageListener
     
     public final Array<GameComponent> components=new Array<GameComponent>();
     
+    public GameObject(String name,GameComponent... gameComponents) {
+        this(name);
+        this.addComponents(gameComponents);
+    }
+    public GameObject(String name) {
+        this.name=name;
+    }
+    public GameObject() {
+    }
     public final <T extends GameComponent> T getComponent(Class<T> type)
     {
         for(int i=0;i<components.size;i++)
@@ -126,6 +135,7 @@ public class GameObject implements MessageListener
         components.clear();
     }
     public Joint getLevel() {
+        if(parent==null)return (Joint)this;
         return parent.getLevel();
     }
     public Joint getParent() {

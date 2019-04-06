@@ -1,0 +1,7 @@
+<map>
+	<layer name="layer0" path="maps\tutorial\layer0"/>
+	<layer name="layer1" path="maps\tutorial\layer1"/>
+	<layer name="layer2" path="maps\tutorial\layer2"/>
+	<layer name="layer3" path="maps\tutorial\layer3"/>
+	<layer name="layer4" path="maps\tutorial\layer4"/>
+</map>

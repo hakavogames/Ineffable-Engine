@@ -15,13 +15,20 @@
  */
 
 package com.hakavo.ineffable.core;
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.hakavo.ineffable.assets.*;
 
 public class Sprite2D extends GameComponent
 {
     public TextureRegion textureRegion;
-    public Sprite2D() {}
+    public Sprite2D() {textureRegion=new TextureRegion();}
+    public Sprite2D(String assetName) {
+        this((Texture)AssetManager.getAsset(assetName));
+    }
+    public Sprite2D(Texture texture) {
+        textureRegion=new TextureRegion(texture);
+    }
     public Sprite2D(TextureRegion textureRegion) {
         this.textureRegion=textureRegion;
     }

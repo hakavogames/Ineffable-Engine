@@ -6,7 +6,7 @@ import com.badlogic.gdx.files.FileHandle;
 
 public class MusicLoader extends AssetLoader<Music> {
     @Override
-    public Music load(FileHandle fh) {
+    public Music load(FileHandle fh,Object... params) {
         Music music=Gdx.audio.newMusic(fh);
         return music;
     }

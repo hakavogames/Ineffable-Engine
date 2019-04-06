@@ -3,6 +3,7 @@ package com.hakavo.ineffable.core.collision;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Pools;
 import com.hakavo.ineffable.core.*;
+import com.hakavo.ineffable.gameobjects.Map;
 
 public class CircleCollider extends Collider {
     public Transform transform;
@@ -10,7 +11,8 @@ public class CircleCollider extends Collider {
     private float transformedRadius;
     public float x,y,radius;
     
-    public CircleCollider() {
+    public CircleCollider(float radius) {
+        this.radius=radius;
     }
     public CircleCollider(float x,float y,float radius) {
         this.radius=radius;
@@ -32,6 +34,31 @@ public class CircleCollider extends Collider {
     }
     public float getTransformedRadius() {
         return transformedRadius;
+    }
+    @Override
+    public float getVolume() {
+        return MathUtils.PI*radius*radius;
+    }
+    @Override
+    public Vector2 getNormal(Collider collider,Vector2 out) {
+        if(collider instanceof BoxCollider)
+        {
+            /*BoxCollider box=(BoxCollider)collider;
+            float deltaX=position.x-Math.max(box.getTransformedX(),Math.min(position.x,box.getTransformedX()+box.getTransformedWidth()));
+            float deltaY=position.y-Math.max(box.getTransformedY(),Math.min(position.y,box.getTransformedY()+box.getTransformedHeight()));
+            //return (deltaX*deltaX+deltaY*deltaY)<(transformedRadius*transformedRadius);*/
+            return collider.getNormal(this,out);
+        }
+        else if(collider instanceof CircleCollider)
+        {
+            CircleCollider circle=(CircleCollider)collider;
+            out.set(circle.position).sub(position);
+            float dist=Vector2.dst(this.getTransformedX(),this.getTransformedY(),circle.getTransformedX(),circle.getTransformedY());
+            out.scl((this.getTransformedRadius()+circle.getTransformedRadius())-dist);
+            return out;
+        }
+        
+        return out.set(0,0);
     }
     
     @Override
@@ -59,7 +86,7 @@ public class CircleCollider extends Collider {
         return cc;
     }
     @Override
-    protected boolean collides(Collider collider) {
+    public boolean collides(Collider collider) {
         if(collider instanceof BoxCollider)
         {
             BoxCollider box=(BoxCollider)collider;
@@ -79,6 +106,8 @@ public class CircleCollider extends Collider {
             return Vector2.dst(this.getTransformedX(),this.getTransformedY(),
                                point.getTransformedX(),point.getTransformedY())<this.getTransformedRadius();
         }
+        else if(collider instanceof Map.MapCollider)
+            return collider.collides(this);
         
         return false;
     }

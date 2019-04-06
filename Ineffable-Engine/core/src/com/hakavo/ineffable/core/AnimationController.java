@@ -45,6 +45,7 @@ public class AnimationController extends GameComponent implements GameComponent.
     }
     @Override
     public void start() {
+        animations.addAll(gameObject.getComponents(Animation.class));
         for(int i=0;i<animations.size;i++)
         {
             animations.get(i).start();
@@ -86,6 +87,12 @@ public class AnimationController extends GameComponent implements GameComponent.
     }
     public void play(String name) {
         play(getAnimationIndexByName(name));
+    }
+    public void setAnimation(int index) {
+        if(currentAnim!=index||(currentAnim==index&&!isPlaying()))play(index);
+    }
+    public void setAnimation(String name) {
+        setAnimation(getAnimationIndexByName(name));
     }
     public void stop() {
         if(currentAnim<animations.size)

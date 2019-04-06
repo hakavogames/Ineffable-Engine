@@ -20,6 +20,7 @@ public abstract class GameComponent
 {
     protected GameObject gameObject;
     protected MessageListener messageListener;
+    private boolean active=true;
     public String name="";
     public Object userData;
     
@@ -27,6 +28,7 @@ public abstract class GameComponent
         this.gameObject=copyFrom.gameObject;
         this.messageListener=copyFrom.messageListener;
         this.name=copyFrom.name;
+        this.userData=copyFrom.userData;
     }
     
     public abstract void update(float delta);
@@ -42,6 +44,12 @@ public abstract class GameComponent
     }
     public final void sendMessage(String gameObjectName,String message,Object... parameters) {
         gameObject.getLevel().findGameObjectByName(gameObjectName).messageReceived(this.gameObject,message,parameters);
+    }
+    public final boolean isActive() {
+        return active;
+    }
+    public final void setActive(boolean active) {
+        this.active=active;
     }
     
     public void onDestroy() {

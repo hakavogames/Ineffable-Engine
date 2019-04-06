@@ -25,7 +25,7 @@ import com.badlogic.gdx.files.FileHandle;
  */
 public class SoundEffect extends Hearable {
     public Sound sound;
-    private long[] ids = new long[50];
+    private long[] ids = new long[128];
     private byte lastEmptyID = 0;
     
     public SoundEffect(Sound sound, float volume, int layer) {
@@ -77,8 +77,9 @@ public class SoundEffect extends Hearable {
     }
     
     public void play() {
-        ids[lastEmptyID] = sound.play(this.volume);
-        lastEmptyID++;
+        //ids[lastEmptyID] = sound.play(this.volume);
+        //lastEmptyID++;
+        ids[0]=sound.play(this.volume);
     }
     public void pause() {
         if(lastEmptyID > 0)sound.pause(ids[lastEmptyID - 1]);

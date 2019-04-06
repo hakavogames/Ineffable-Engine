@@ -18,6 +18,7 @@ package com.hakavo.ineffable;
 import com.hakavo.ineffable.gameobjects.Map;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.*;
@@ -33,7 +34,6 @@ public class Editor implements GameMode,InputProcessor {
     Tileset tileset;
     Map map;
     Vector2 velocity=new Vector2(),camAdd=new Vector2(),selStart=new Vector2(),selEnd=new Vector2();
-    ShapeRenderer sr;
     Skin skin;
     Stage stage;
     Window window;
@@ -41,25 +41,38 @@ public class Editor implements GameMode,InputProcessor {
     TextField tsname;
     TextButton loadts;
     Dialog tiles;
+    Label currentLayer;
     Tile tile;
     ButtonGroup<Button> bt=new ButtonGroup<Button>();
     Engine engine;
     float targetZoom=1;
+    int layer=0;
     @Override
     public void init(Engine engine) {
         this.engine=engine;
+        engine.camera=new OrthographicCamera((float)Gdx.graphics.getWidth()/Gdx.graphics.getHeight()*225,225);
         inputMultiplexer=new InputMultiplexer();
-        sr=new ShapeRenderer();
-        tileset=new Tileset(Gdx.files.internal("tileset.xml"));
+        tileset=new Tileset(Gdx.files.internal("tilesets/wwii/tileset.xml"));
+        tileset.init(new Texture("tilesets/tiles_cus_perks.gif"),16);
         map=new Map(32,32,tileset);
+        map.addLayer();
+        map.addLayer();
+        map.addLayer();
         map.addLayer();
         tile=tileset.tiles.get(0);
         
-        for(int i=0;i<32;i++)
-            for(int j=0;j<32;j++)
-                map.getLayer("layer0").data[i][j].parent=tileset.tiles.get(0);
+        for(int k=0;k<map.layers.size;k++)
+        {
+            for(int i=0;i<32;i++)
+                for(int j=0;j<32;j++)
+                {
+                    map.layers.get(k).data[i][j].parent=tileset.tiles.get(0);
+                    //if(k>0)
+                        map.layers.get(k).data[i][j].visible=false;
+                }
+        }
         
-        engine.level.gameObjects.add(map);
+        engine.getLevel().addGameObject(map);
         initUI();
         Gdx.input.setInputProcessor(inputMultiplexer);
     }
@@ -81,6 +94,7 @@ public class Editor implements GameMode,InputProcessor {
         window.setX(Gdx.graphics.getWidth()-window.getWidth());
         window.setLayoutEnabled(true);
         window.align(Align.topLeft);
+        currentLayer=new Label("Current layer: "+layer,skin);
         
         tsname=new TextField("tileset.xml",skin);
         loadts=new TextButton("Load",skin);
@@ -108,9 +122,12 @@ public class Editor implements GameMode,InputProcessor {
         brush.add("Brush").left().row();
         brush.add(pickBrush);
         window.add(brush).left().row();
+        window.add(currentLayer).row();
         
         inputMultiplexer.addProcessor(stage);
         inputMultiplexer.addProcessor(this);
+        
+        
         stage.addActor(window);
         stage.addActor(tiles);
     }
@@ -120,7 +137,7 @@ public class Editor implements GameMode,InputProcessor {
     {
         tiles=new Dialog("Tiles",skin);
         tiles.setVisible(false);
-        tiles.setSize(950,800);
+        tiles.setSize(670,800);
         tiles.align(Align.topLeft);
         Table table=new Table(skin);
         TextButton close=new TextButton("Close",skin);
@@ -161,7 +178,7 @@ public class Editor implements GameMode,InputProcessor {
     }
     @Override
     public void update(float delta) {
-        
+        currentLayer.setText("Current layer: "+layer+"; max layers: "+map.getLayerCount());
         float speed=Gdx.graphics.getDeltaTime()*100;
         
         velocity.set(0,0);
@@ -169,6 +186,15 @@ public class Editor implements GameMode,InputProcessor {
         if(Gdx.input.isKeyPressed(Input.Keys.S))velocity.y=-speed;
         if(Gdx.input.isKeyPressed(Input.Keys.A))velocity.x=-speed;
         if(Gdx.input.isKeyPressed(Input.Keys.D))velocity.x=speed;
+        if(Gdx.input.isKeyJustPressed(Input.Keys.K)) {
+            map.write(Gdx.files.local("maps/tutorial/"));
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.L)) {
+            map.read(Gdx.files.local("maps/tutorial/map.xml"));
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+            tile=map.layers.get(layer).data[(int)selStart.x/tileset.tilesize][(int)selStart.y/tileset.tilesize].parent;
+        }
         
         camAdd.x=Interpolation.linear.apply(camAdd.x,velocity.x,0.1f);
         camAdd.y=Interpolation.linear.apply(camAdd.y,velocity.y,0.1f);
@@ -184,19 +210,21 @@ public class Editor implements GameMode,InputProcessor {
         
         boolean ok=true;
         int x=Gdx.input.getX();
-        int y=Gdx.input.getY();
+        int y=Gdx.graphics.getHeight()-Gdx.input.getY();
         for(int i=0;i<stage.getActors().size;i++)
         {
             Actor actor=stage.getActors().get(i);
-            if(x>=actor.getX()&&y>=actor.getY()&&x<=actor.getX()+actor.getWidth()&&y<=actor.getY()+actor.getHeight())
+            if(x>=actor.getX()&&y>=actor.getY()&&x<=actor.getX()+actor.getWidth()&&y<=actor.getY()+actor.getHeight()&&actor.isVisible())
             {
                 ok=false;
                 break;
             }
         }
-        if(Gdx.input.isButtonPressed(Buttons.BACK)||Gdx.input.isButtonPressed(Buttons.FORWARD)||
-           Gdx.input.isButtonPressed(Buttons.LEFT)||Gdx.input.isButtonPressed(Buttons.MIDDLE)||Gdx.input.isButtonPressed(Buttons.RIGHT)&&ok==true)
-            if(ok==true)onButtonDown();
+        if(Gdx.input.isKeyJustPressed(Keys.PLUS))layer=layer+1<map.getLayerCount()?layer+1:layer;
+        else if(Gdx.input.isKeyJustPressed(Keys.MINUS))layer=layer-1>=0?layer-1:layer;
+        if((Gdx.input.isButtonPressed(Buttons.BACK)||Gdx.input.isButtonPressed(Buttons.FORWARD)||
+           Gdx.input.isButtonPressed(Buttons.LEFT)||Gdx.input.isButtonPressed(Buttons.MIDDLE)||Gdx.input.isButtonPressed(Buttons.RIGHT))&&ok==true)
+            onButtonDown();
         
         int tilesize=map.tileset.tilesize;
         int w=map.getWidth();
@@ -210,13 +238,24 @@ public class Editor implements GameMode,InputProcessor {
     }
     @Override
     public void renderGui(OrthographicCamera cam) {
+        BitmapFont font=GameServices.getFonts().getValueAt(0);
+        
+        font.draw(GameServices.getSpriteBatch(),
+            "DEBUG MODE   Position: "+(int)selStart.x/tileset.tilesize+" x "+(int)selStart.y/tileset.tilesize+
+            " Zoom out: "+Math.round(engine.camera.zoom*10)/10f+
+            "x  Tile size: "+tileset.tilesize+"  Tile pos: "+tile.tileX+" x "+tile.tileY,10,30);
+        
+        GameServices.getSpriteBatch().end();
+        ShapeRenderer sr=GameServices.getShapeRenderer();
+        sr.setTransformMatrix(GameServices.getSpriteBatch().getTransformMatrix());
+        
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA,GL20.GL_ONE_MINUS_SRC_ALPHA);
         sr.begin(ShapeRenderer.ShapeType.Filled);
         sr.setProjectionMatrix(engine.camera.combined);
         
         sr.setColor(1,1,1,0.25f);
-        sr.rect(selStart.x,selStart.y,24,24);
+        sr.rect(selStart.x,selStart.y,map.tileset.tilesize,map.tileset.tilesize);
         sr.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
         
@@ -229,9 +268,15 @@ public class Editor implements GameMode,InputProcessor {
         int h=map.getHeight();
         
         if(Gdx.input.isButtonPressed(Buttons.LEFT))
-            map.getLayer(0).data[(int)selStart.x/tilesize][(int)selStart.y/tilesize].parent=tile;
+        {
+            map.getLayer(layer).data[(int)selStart.x/tilesize][(int)selStart.y/tilesize].parent=tile;
+            map.getLayer(layer).data[(int)selStart.x/tilesize][(int)selStart.y/tilesize].visible=true;
+        }
         else if(Gdx.input.isButtonPressed(Buttons.RIGHT))
+        {
             engine.camera.position.sub(Gdx.input.getDeltaX()/5*engine.camera.zoom,-Gdx.input.getDeltaY()/5*engine.camera.zoom,0);
+            map.getLayer(layer).data[(int)selStart.x/tilesize][(int)selStart.y/tilesize].visible=false;
+        }
     }
 
     @Override

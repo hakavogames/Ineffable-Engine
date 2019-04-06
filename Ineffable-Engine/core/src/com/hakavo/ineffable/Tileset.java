@@ -64,6 +64,13 @@ public class Tileset {
                 return i;
         return -1;
     }
+    public Tile getTileByCoords(int tileX,int tileY)
+    {
+        for(int i=0;i<tiles.size;i++)
+            if(tiles.get(i).tileX==tileX&&tiles.get(i).tileY==tileY)
+                return tiles.get(i);
+        return null;
+    }
     public void init(Texture tex,int tilesize)
     {
         if(tex.getWidth()%tilesize>0||tex.getHeight()%tilesize>0)

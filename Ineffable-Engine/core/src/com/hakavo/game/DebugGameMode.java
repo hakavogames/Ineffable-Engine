@@ -77,7 +77,7 @@ public class DebugGameMode implements GameMode {
         
         Dialogue greeting=new Dialogue("greeting","Hello, I'm a trashman.",4);
         Dialogue greeting2=new Dialogue("greeting2","People there call me Gelu.",3);
-        Dialogue question=new Dialogue("question","Can you give me some money for cigarettes?",1.5f);
+        Dialogue question=new Dialogue("question","Can you give me some money?",1.5f);
         Dialogue answer1=new Dialogue("answer-yes","Thanx kid",2) {
             @Override
             public void onDialogueComplete() {

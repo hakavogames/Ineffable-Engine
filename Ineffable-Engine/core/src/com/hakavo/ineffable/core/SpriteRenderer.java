@@ -28,15 +28,30 @@ public class SpriteRenderer extends Renderable implements GameComponent.Copiable
     public Color color=new Color(1,1,1,1);
     private Transform transform;
     
-    public SpriteRenderer(Sprite2D sprite,boolean flipX,boolean flipY)
-    {
+    private boolean scaleToUnit=false;
+    public float size=1;
+    
+    private SpriteRenderer(Sprite2D sprite,boolean flipX,boolean flipY,boolean scaleToUnit,float size) {
+        this(sprite,flipX,flipY);
+        this.scaleToUnit=scaleToUnit;
+        this.size=size;
+    }
+    public SpriteRenderer(Sprite2D sprite,boolean flipX,boolean flipY,float size) {
+        this(sprite,flipX,flipY,true,size);
+    }
+    public SpriteRenderer(Sprite2D sprite,boolean flipX,boolean flipY) {
         this.sprite=sprite;
         this.flipX=flipX;
         this.flipY=flipY;
     }
-    public SpriteRenderer(Sprite2D sprite)
-    {
-        this(sprite,false,false);
+    public SpriteRenderer(Sprite2D sprite,float size) {
+        this(sprite,false,false,true,size);
+    }
+    public SpriteRenderer(Sprite2D sprite) {
+        this(sprite,false,false,false,1);
+    }
+    public void setTransform(Transform transform) {
+        this.transform=transform;
     }
     @Override
     public void start() {
@@ -47,7 +62,7 @@ public class SpriteRenderer extends Renderable implements GameComponent.Copiable
     }
     @Override
     public SpriteRenderer cpy() {
-        SpriteRenderer sr=new SpriteRenderer(sprite,this.flipX,this.flipY);
+        SpriteRenderer sr=new SpriteRenderer(sprite,this.flipX,this.flipY,this.scaleToUnit,this.size);
         sr.copyFrom(this);
         sr.color.set(this.color);
         return sr;
@@ -60,6 +75,11 @@ public class SpriteRenderer extends Renderable implements GameComponent.Copiable
         {
             Matrix3 mat=Pools.obtain(Matrix3.class).idt();
             if(transform!=null)transform.calculateMatrix(mat);
+            if(scaleToUnit) {
+                float aspectRatio=(float)(sprite.textureRegion.getRegionWidth())/sprite.textureRegion.getRegionHeight();
+                mat.scale(size/sprite.textureRegion.getRegionWidth()*aspectRatio,size/sprite.textureRegion.getRegionHeight());
+            }
+            mat.translate(-sprite.textureRegion.getRegionWidth()/2,-sprite.textureRegion.getRegionHeight()/2);
             
             Matrix4 foo=Pools.obtain(Matrix4.class).set(mat);
             
