@@ -70,6 +70,8 @@ public class Transform extends GameComponent implements GameComponent.Copiable {
     }
     @Override
     public void start() {
+        if(gameObject.getParent()!=null&&gameObject.getParent().hasComponent(Transform.class))
+            this.setRelative(gameObject.getParent().getComponent(Transform.class));
     }
     @Override
     public void update(float delta) {

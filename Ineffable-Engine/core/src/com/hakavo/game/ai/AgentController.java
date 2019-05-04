@@ -29,20 +29,13 @@ public class AgentController extends GameComponent implements Copiable {
     
     public void assignTask(Task task) {
         task.parent=this;
-        task.init(this);
         tasks.addFirst(task);
-    }
-    public Task getCurrentTask() {
-        return tasks.first();
-    }
-    public boolean isIdle() {
-        return tasks.size==0;
     }
 
     @Override
     public AgentController cpy() {
         AgentController ac=new AgentController();
-        for(int i=tasks.size;i>=0;i--)
+        for(int i=tasks.size-1;i>=0;i--)
             ac.assignTask(tasks.get(i));
         return ac;
     }

@@ -26,7 +26,9 @@ public abstract class Renderable extends GameComponent
     public void prepareRendering() {
     }
     public abstract void render(OrthographicCamera camera);
-    public void onGui(OrthographicCamera gui){}
+    @Deprecated
+    public void onGui(OrthographicCamera gui) {
+    }
     @Override
     public <T extends GameComponent> void copyFrom(T copyFrom) {
         super.copyFrom(copyFrom);

@@ -15,30 +15,40 @@
  */
 
 package com.hakavo.ineffable.core;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.hakavo.ineffable.assets.*;
 
-public class Sprite2D extends GameComponent
+public class Sprite2D extends GameComponent implements GameComponent.Copiable
 {
     public TextureRegion textureRegion;
-    public Sprite2D() {textureRegion=new TextureRegion();}
+    public Sprite2D() {
+        AssetManager.loadAsset("texture",Gdx.files.internal("sprites/pixel.png"),"tex_blank");
+        textureRegion=new TextureRegion(AssetManager.getAsset("tex_blank",Texture.class));
+    }
     public Sprite2D(String assetName) {
-        this((Texture)AssetManager.getAsset(assetName));
+        this(AssetManager.getAsset(assetName,Texture.class));
     }
     public Sprite2D(Texture texture) {
         textureRegion=new TextureRegion(texture);
     }
     public Sprite2D(TextureRegion textureRegion) {
         this.textureRegion=textureRegion;
+        this.textureRegion.setTexture(textureRegion.getTexture());
     }
     public Sprite2D(Sprite2D copyFrom) {
         this.textureRegion=new TextureRegion(copyFrom.textureRegion);
+        this.textureRegion.setTexture(copyFrom.textureRegion.getTexture());
     }
     @Override
     public void update(float delta) {
     }
     @Override
     public void start() {
+    }
+    @Override
+    public Sprite2D cpy() {
+        return new Sprite2D(textureRegion);
     }
 }

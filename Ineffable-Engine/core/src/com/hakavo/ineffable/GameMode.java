@@ -22,5 +22,7 @@ public interface GameMode
 {
     public void init(Engine engine);
     public void update(float delta);
+
+    @Deprecated
     public void renderGui(OrthographicCamera camera);
 }

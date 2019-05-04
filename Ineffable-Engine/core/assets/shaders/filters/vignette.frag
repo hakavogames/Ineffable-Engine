@@ -6,7 +6,7 @@ varying vec2 v_texCoords;
 
 const vec2 center=vec2(0.5);
 const float vignetteX=0.8,vignetteY=0.25;
-const float vignetteIntensity=1;
+const float vignetteIntensity=0.5;
 
 void main()
 {

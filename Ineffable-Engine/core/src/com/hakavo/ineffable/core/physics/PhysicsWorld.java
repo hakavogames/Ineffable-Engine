@@ -15,7 +15,7 @@ public class PhysicsWorld extends GameComponent {
     @Override
     public void update(float delta) {
         for(int i=0;i<bodies.size;i++) {
-            bodies.get(i).addForce(gravity.cpy().scl(bodies.get(i).mass));
+            //bodies.get(i).addForce(gravity.cpy().scl(bodies.get(i).mass));
             for(int j=i+1;j<bodies.size;j++) {
                 RigidBody A=bodies.get(i);
                 RigidBody B=bodies.get(j);

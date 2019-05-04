@@ -1,13 +1,15 @@
 package com.hakavo.ineffable.core.collision;
 
 import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
+import com.hakavo.ineffable.Engine;
 import com.hakavo.ineffable.core.Transform;
 import com.hakavo.ineffable.gameobjects.Map;
 
 public class PointCollider extends Collider {
     public Transform transform;
-    private Vector2 position;
+    private Vector2 position=new Vector2();
     public float x,y;
     
     public PointCollider() {
@@ -32,8 +34,8 @@ public class PointCollider extends Collider {
     
     @Override
     public void start() {
-        transform=this.getGameObject().getComponent(Transform.class);
-        position=new Vector2();
+        if(getGameObject()!=null)
+            transform=this.getGameObject().getComponent(Transform.class);
     }
     @Override
     public void update(float delta) {
@@ -65,7 +67,26 @@ public class PointCollider extends Collider {
         
         return false;
     }
-    
+    @Override
+    public Array<Collider> cast(Vector2 direction,float step,int samples) {
+        Array<Collider> coll=new Array<Collider>();
+        PointCollider p=this.cpy();
+        p.start();
+        
+        for(int i=0;i<samples;i++) {
+            p.x+=direction.x*step;
+            p.y+=direction.y*step;
+            p.update(0);
+            this.getGameObject().getLevel();
+            Array<Collider> tmp=this.getGameObject().getLevel().getComponent(Engine.GameManager.class).testCollision(p);
+            for(Collider collider : tmp) {
+                if(!collider.equals(this)&&!coll.contains(collider,false))
+                    coll.add(collider);
+            }
+        }
+        
+        return coll;
+    }
     @Override
     public String toString() {
         return "["+getTransformedX()+","+getTransformedY()+"]";

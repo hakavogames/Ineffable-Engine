@@ -77,9 +77,9 @@ public class SoundEffect extends Hearable {
     }
     
     public void play() {
-        //ids[lastEmptyID] = sound.play(this.volume);
-        //lastEmptyID++;
-        ids[0]=sound.play(this.volume);
+        ids[lastEmptyID] = sound.play(this.volume);
+        lastEmptyID++;
+        //ids[0]=sound.play(this.volume);
     }
     public void pause() {
         if(lastEmptyID > 0)sound.pause(ids[lastEmptyID - 1]);
@@ -165,5 +165,9 @@ public class SoundEffect extends Hearable {
 
     @Override
     public void start() {
+    }
+    @Override
+    public void onDestroy() {
+        sound.stop();
     }
 }

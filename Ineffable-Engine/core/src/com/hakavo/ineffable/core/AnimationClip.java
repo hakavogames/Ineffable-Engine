@@ -23,4 +23,17 @@ public class AnimationClip
     public Array<TextureRegion> frames=new Array<TextureRegion>();
     public float duration=1; // seconds
     public boolean loop=false;
+    
+    public AnimationClip() {
+    }
+    public AnimationClip(Array<TextureRegion> frames,float duration,boolean loop) {
+        this.frames=frames;
+        this.duration=duration;
+        this.loop=loop;
+    }
+    public AnimationClip(float duration,boolean loop,TextureRegion... frames) {
+        this.duration=duration;
+        this.loop=loop;
+        this.frames.addAll(frames);
+    }
 }

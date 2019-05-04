@@ -44,6 +44,9 @@ public class BoxCollider extends Collider {
     public final boolean isEmpty() {
         return width==0f||height==0f;
     }
+    public final Vector2 getCenter(Vector2 out) {
+        return out.set(b1.x+b2.x/2,b1.y+b2.y/2);
+    }
     @Override
     public final float getVolume() {
         return width*height;

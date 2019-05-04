@@ -4,7 +4,7 @@ uniform sampler2D u_texture;
 uniform vec2 u_screenSize;
 uniform float u_time;
 
-const float offset=0.0005;
+const float offset=0.001;
 const float bDistortion=0.1;
 
 varying vec2 v_texCoords;

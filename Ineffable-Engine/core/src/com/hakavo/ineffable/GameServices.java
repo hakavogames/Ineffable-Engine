@@ -24,6 +24,8 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.*;
+import com.hakavo.ineffable.core.Sprite2D;
+import javax.script.*;
 import java.util.Random;
 
 public class GameServices {
@@ -31,7 +33,10 @@ public class GameServices {
     protected static ShapeRenderer shapeRenderer;
     protected static ShaderProgram defaultShader;
     protected static ArrayMap<String,BitmapFont> fonts;
+    protected static OrthographicCamera camera;
     private static long startTime;
+    
+    public static final FileHandle scriptUtilsPath=Gdx.files.internal("scripts/utils/on_script_load.js");
     
     public static void init()
     {
@@ -41,14 +46,23 @@ public class GameServices {
         startTime=TimeUtils.millis();
         
         fonts=new ArrayMap<String,BitmapFont>();
-        fonts.put("pixeltype",createFont(Gdx.files.internal("fonts/pixeltype2.ttf"),32));
-        fonts.getValueAt(0).getData().markupEnabled=false;
+        fonts.put("pixeltype",createFont(Gdx.files.internal("fonts/pixeltype.ttf"),32));
+        fonts.put("opensans",createFont(Gdx.files.internal("fonts/opensans-regular.ttf"),18));
+        fonts.put("opensans-bold",createFont(Gdx.files.internal("fonts/opensans-bold.ttf"),18));
+        fonts.getValueAt(1).getData().markupEnabled=true;
+        fonts.getValueAt(2).getData().markupEnabled=true;
         
         initPools();
-        
-        /*defaultShader=new ShaderProgram(Gdx.files.internal("shaders/default.vert"),Gdx.files.internal("shaders/default.frag"));
-        if(!defaultShader.isCompiled())
-            throw new GdxRuntimeException(defaultShader.getLog());*/
+    }
+    public static void loadScript(FileHandle fileHandle) {
+        try {
+            ScriptEngine engine=new ScriptEngineManager().getEngineByName("nashorn");
+            engine.eval(scriptUtilsPath.readString());
+            engine.eval(fileHandle.readString());
+        } catch(Exception ex) {
+            System.err.println("Could not load script located at "+fileHandle.path());
+            ex.printStackTrace(System.err);
+        }
     }
     private static void initPools()
     {
@@ -88,6 +102,9 @@ public class GameServices {
         Pools.set(Transform.class,transformPool);
         Pools.set(Vector2.class,vector2Pool);
     }
+    public static OrthographicCamera getCamera() {
+        return camera;
+    }
     public static SpriteBatch getSpriteBatch() {
         return spriteBatch;
     }
@@ -115,10 +132,23 @@ public class GameServices {
         FreeTypeFontGenerator.FreeTypeFontParameter parameter=new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size=size;
         BitmapFont fnt=generator.generateFont(parameter);
+        fnt.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear,Texture.TextureFilter.Linear);
         generator.dispose();
         return fnt;
     }
     public static ArrayMap<String,BitmapFont> getFonts() {
         return fonts;
+    }
+    public static class TextureSplitter {
+        public static Array<TextureRegion> split(Texture input,int size) {
+            return split(new TextureRegion(input),size);
+        }
+        public static Array<TextureRegion> split(TextureRegion input,int size) {
+            Array<TextureRegion> out=new Array<TextureRegion>();
+            for(int i=0;i<input.getRegionHeight()/size;i++)
+                for(int j=0;j<input.getRegionWidth()/size;j++)
+                    out.add(new TextureRegion(input,j*size,i*size,size,size));
+            return out;
+        }
     }
 }

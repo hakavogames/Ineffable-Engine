@@ -1,5 +1,6 @@
 package com.hakavo.ineffable.assets;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
 
@@ -15,6 +16,8 @@ public final class AssetManager {
         loaders.put("sound",new SoundLoader());
         loaders.put("music",new MusicLoader());
         loaders.put("shader",new ShaderLoader());
+        loaders.put("prefab",new PrefabLoader());
+        loaders.put("tileset",new TilesetLoader());
     }
     public static <T> T loadAsset(String format,FileHandle file,String name,Object... params)
     {
@@ -22,11 +25,24 @@ public final class AssetManager {
         AssetLoader loader=loaders.get(format);
         T asset=(T)loader.load(file,params);
         assets.put(name,asset);
-        return asset;
+        return (T)asset;
+    }
+    public static void loadAssetBundle(FileHandle jsonFile) {
+        JsonValue root=new JsonReader().parse(jsonFile).get("assetBundle");
+        
+        for(JsonValue entry : root) {
+            String[] params=entry.hasChild("params")?entry.getChild("params").asStringArray():new String[0];
+            String path=jsonFile.path().substring(0,jsonFile.path().lastIndexOf("/"))+"/"+entry.getString("path");
+            loadAsset(entry.getString("format"),Gdx.files.internal(path),
+                      entry.getString("name"),(Object[])params);
+        }
     }
     public static <T> T getAsset(String name)
     {
         T asset=(T)assets.get(name);
-        return asset;
+        return (T)asset;
+    }
+    public static <T> T getAsset(String name,Class<T> type) {
+        return (T)getAsset(name);
     }
 }

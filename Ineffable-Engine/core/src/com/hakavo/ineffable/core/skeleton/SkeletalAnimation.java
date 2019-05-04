@@ -4,12 +4,13 @@ import com.badlogic.gdx.utils.*;
 import com.hakavo.ineffable.*;
 import com.hakavo.ineffable.core.*;
 
-public class SkeletalAnimation extends GameComponent {
+public class SkeletalAnimation extends GameComponent implements GameComponent.Copiable {
     public Array<KeyFrame> keyFrames=new Array<KeyFrame>();
     protected Bone target;
     
     public boolean loop;
     public boolean invert;
+    private SkeletalAnimationCallback callback;
     private float duration;
     private float currentTime,startTime;
     private boolean playing;
@@ -57,6 +58,9 @@ public class SkeletalAnimation extends GameComponent {
                 }
             }
     }
+    public void setCallback(SkeletalAnimationCallback callback) {
+        this.callback=callback;
+    }
     private void interpolate(KeyFrame a,KeyFrame b,float f) {
         float c=(invert==false) ? 1f : -1f;
         keyA.clear();
@@ -89,11 +93,13 @@ public class SkeletalAnimation extends GameComponent {
         currentTime=GameServices.getElapsedTime();
         startTime=currentTime;
         playing=true;
+        if(callback!=null)callback.onAnimationBegin();
     }
     public void stop() {
         playing=false;
         currentTime=0;
         startTime=0;
+        if(callback!=null)callback.onAnimationEnd();
     }
     public void pause() {
         playing=false;
@@ -102,4 +108,12 @@ public class SkeletalAnimation extends GameComponent {
         playing=true;
     }
     public boolean isPlaying() {return playing;}
+    
+    @Override
+    public SkeletalAnimation cpy() {
+        SkeletalAnimation out=new SkeletalAnimation(this.name,this.loop);
+        out.setCallback(this.callback);
+        out.keyFrames.addAll(this.keyFrames);
+        return out;
+    }
 }

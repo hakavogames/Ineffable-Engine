@@ -50,12 +50,16 @@ public class SpriteRenderer extends Renderable implements GameComponent.Copiable
     public SpriteRenderer(Sprite2D sprite) {
         this(sprite,false,false,false,1);
     }
+    public SpriteRenderer() {
+    }
     public void setTransform(Transform transform) {
         this.transform=transform;
     }
     @Override
     public void start() {
         transform=this.gameObject.getComponent(Transform.class);
+        if(sprite==null)
+            sprite=gameObject.getComponent(Sprite2D.class);
     }
     @Override
     public void update(float delta) {

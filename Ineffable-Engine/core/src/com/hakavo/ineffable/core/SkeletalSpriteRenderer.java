@@ -3,7 +3,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.utils.Array;
 import com.hakavo.ineffable.core.skeleton.*;
 
-public class SkeletalSpriteRenderer extends Renderable {
+public class SkeletalSpriteRenderer extends Renderable implements GameComponent.Copiable {
     private Bone skeleton;
     private final Array<Bone> bones=new Array<Bone>();
     private Transform transform;
@@ -38,5 +38,9 @@ public class SkeletalSpriteRenderer extends Renderable {
     }
     public Bone getSkeleton() {
         return this.skeleton;
+    }
+    @Override
+    public SkeletalSpriteRenderer cpy() {
+        return new SkeletalSpriteRenderer(this.skeleton.cpy());
     }
 }

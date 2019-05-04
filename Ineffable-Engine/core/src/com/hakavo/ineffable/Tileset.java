@@ -25,6 +25,7 @@ import com.badlogic.gdx.utils.XmlReader.Element;
 public class Tileset {
     public final Array<Tile> tiles=new Array<Tile>();
     public Texture atlas;
+    private String fname;
     public int tilesize;
     public Tileset() {}
     public Tileset(Texture tex,int tilesize)
@@ -33,6 +34,7 @@ public class Tileset {
     }
     public Tileset(FileHandle fh,int tilesize)
     {
+        fname=fh.path();
         init(new Texture(fh),tilesize);
     }
     public Tileset(FileHandle fh)
@@ -42,6 +44,7 @@ public class Tileset {
             Element root=r.parse(fh);
             Element tiledata=root.getChildByName("tiledata");
             atlas=new Texture(Gdx.files.internal(tiledata.getAttribute("filename")));
+            fname=tiledata.getAttribute("filename");
             tilesize=Integer.valueOf(tiledata.getAttribute("tilesize"));
             if(atlas.getWidth()%tilesize>0||atlas.getHeight()%tilesize>0)
                 throw new GdxRuntimeException("Tileset texture can't be split in "+tilesize+"x"+tilesize+" tiles.");
@@ -56,6 +59,28 @@ public class Tileset {
                 tiles.add(tile);
             }
         }catch(Exception ex){ex.printStackTrace(System.err);Gdx.app.exit();}
+    }
+    public void save(FileHandle fh) {
+        XmlWriter w=new XmlWriter(fh.writer(false));
+        try {
+            XmlWriter root=w.element("tileset");
+            root.element("tiledata").attribute("filename",fname).attribute("tilesize",tilesize);
+            root.pop();
+            for(Tile tile : tiles) {
+                root.element("tile").attribute("x",tile.tileX).attribute("y",tile.tileY);
+                root.element("name").text(tile.name);
+                root.pop();
+                root.element("collide").text(tile.collide);
+                root.pop();
+                root.pop();
+            }
+            w.flush();
+            w.close();
+        }
+        catch(Exception ex) {
+            ex.printStackTrace(System.err);
+            Gdx.app.exit();
+        }
     }
     public int getTileIndexByName(String name)
     {

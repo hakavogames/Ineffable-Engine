@@ -43,6 +43,9 @@ public class GameObject implements MessageListener
                 return (T)components.get(i);
         return null;
     }
+    public final boolean hasComponent(Class type) {
+        return getComponent(type)!=null;
+    }
     public final <T extends GameComponent> T getComponentByName(String name)
     {
         for(int i=0;i<components.size;i++)
@@ -133,6 +136,7 @@ public class GameObject implements MessageListener
         for(int i=0;i<this.components.size;i++)
             components.get(i).onDestroy();
         components.clear();
+        if(parent!=null)parent.gameObjects.removeValue(this,true);
     }
     public Joint getLevel() {
         if(parent==null)return (Joint)this;
@@ -150,11 +154,17 @@ public class GameObject implements MessageListener
                 obj.addComponent(((GameComponent.Copiable)this.components.get(i)).cpy());
         return obj;
     }
+    @Override
+    public String toString() {
+        return "["+name+","+components+"]";
+    }
 
     @Override
     public void messageReceived(GameObject sender,String message,Object... parameters) {
         for(GameComponent component : components)
+        {
             if(component.getMessageListener()!=null)
                 component.getMessageListener().messageReceived(sender,message,parameters);
+        }
     }
 }

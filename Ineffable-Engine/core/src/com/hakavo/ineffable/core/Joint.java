@@ -105,9 +105,17 @@ public class Joint extends GameObject
     }
     public final void addGameObject(GameObject toAdd)
     {
+        if(super.hasComponent(Transform.class)&&toAdd.hasComponent(Transform.class)) {
+            toAdd.getComponent(Transform.class).setRelative(super.getComponent(Transform.class));
+        }
         gameObjects.add(toAdd);
         toAdd.parent=this;
         toAdd.start();
+    }
+    public final void addGameObjects(GameObject... gameObjects)
+    {
+        for(GameObject gameObject : gameObjects)
+            addGameObject(gameObject);
     }
     
     @Override
@@ -155,9 +163,13 @@ public class Joint extends GameObject
     @Override
     public void destroy() {
         if(destroyed)return;
+        super.destroy();
         for(int i=0;i<this.gameObjects.size;i++)
             this.gameObjects.get(i).destroy();
         this.gameObjects.clear();
-        super.destroy();
+    }
+    @Override
+    public String toString() {
+        return "["+super.toString()+","+gameObjects+"]";
     }
 }

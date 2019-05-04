@@ -22,7 +22,6 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.XmlReader.Element;
-import com.hakavo.game.ai.pathfinding.*;
 import com.hakavo.ineffable.*;
 import com.hakavo.ineffable.assets.AssetManager;
 import com.hakavo.ineffable.core.*;
@@ -91,11 +90,11 @@ public class Map extends GameObject {
             File file=fh.file();
             file.mkdirs();
             
-            File xmlFile=new File(file.getPath().concat("\\map.xml"));
+            File xmlFile=new File(file.getPath().concat("/map.xml"));
             XmlWriter xml=new XmlWriter(new FileWriter(xmlFile)).element("map");
             for(MapLayer layer : layers) {
-                xml.element("layer").attribute("name",layer.name).attribute("path",file.getPath()+"\\"+layer.name).pop();
-                layer.write(Gdx.files.internal(file.getPath()+"\\"+layer.name));
+                xml.element("layer").attribute("name",layer.name).attribute("path",fh.path()+"/"+layer.name).pop();
+                layer.write(Gdx.files.internal(file.getPath()+"/"+layer.name));
             }
             xml.flush();
             xml.close();
@@ -125,7 +124,6 @@ public class Map extends GameObject {
     public class MapCollider extends Collider {
         private Map map;
         private boolean[][] walls;
-        private AStarPathFinder pathFinder;
         @Override
         public void start() {
             map=(Map)this.getGameObject();
@@ -138,26 +136,14 @@ public class Map extends GameObject {
                 for(int x=0;x<map.getWidth();x++)
                     for(int y=0;y<map.getHeight();y++)
                         if(walls[x][y]==false&&map.getLayer(i).data[x][y].parent!=null&&
-                                map.getLayer(i).data[x][y].parent.collide==true)
+                                map.getLayer(i).data[x][y].parent.collide==true&&map.getLayer(i).data[x][y].visible)
                             walls[x][y]=true;
-            if(map.getWidth()*map.getHeight()!=0)
-                pathFinder=new AStarPathFinder(this,32,false);
         }
         public boolean[][] getWalls() {
             return walls;
         }
         @Override
         public void update(float delta) {
-        }
-        public AStarPathFinder getPathFinder() {
-            return pathFinder;
-        }
-        public AIPath findPath(Vector2 start,Vector2 end) {
-            Vector2 scale=super.getGameObject().getComponent(Transform.class).getScale(Pools.obtain(Vector2.class));
-            AIPath result=pathFinder.findPath((int)(start.x/scale.x/tileset.tilesize),(int)(start.y/scale.y/tileset.tilesize),
-                                       (int)(end.x/scale.x/tileset.tilesize),(int)(end.y/scale.y/tileset.tilesize));
-            Pools.free(scale);
-            return result;
         }
 
         @Override

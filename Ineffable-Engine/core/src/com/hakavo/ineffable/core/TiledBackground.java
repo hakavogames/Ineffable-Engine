@@ -56,6 +56,7 @@ public class TiledBackground extends Renderable implements GameComponent.Copiabl
                 pos.set(matrix.getTranslation(foo));
                 scale.set(matrix.getScale(foo));
             }
+            pos.set(GameServices.getCamera().position.x,GameServices.getCamera().position.y);
             
             float viewportWidth=cam.viewportWidth*cam.zoom;
             float viewportHeight=cam.viewportHeight*cam.zoom;

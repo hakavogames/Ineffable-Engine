@@ -50,11 +50,12 @@ public class AnimationController extends GameComponent implements GameComponent.
         {
             animations.get(i).start();
             animations.get(i).setTarget(target);
+            animations.get(i).setGameObject(super.gameObject);
         }
     }
     @Override
     public AnimationController cpy() {
-        AnimationController anim=new AnimationController(this.target);
+        AnimationController anim=new AnimationController((Sprite2D)null);
         anim.copyFrom(this);
         for(int i=0;i<this.animations.size;i++)
             anim.animations.add(this.animations.get(i).cpy());

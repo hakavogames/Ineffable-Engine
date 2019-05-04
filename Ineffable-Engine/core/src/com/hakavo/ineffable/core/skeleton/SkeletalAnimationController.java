@@ -19,8 +19,7 @@ package com.hakavo.ineffable.core.skeleton;
 import com.hakavo.ineffable.core.*;
 import com.badlogic.gdx.utils.*;
 
-public class SkeletalAnimationController extends GameComponent
-{
+public class SkeletalAnimationController extends GameComponent implements GameComponent.Copiable {
     protected Bone target;
     protected int currentAnim;
     public Array<SkeletalAnimation> animations=new Array<SkeletalAnimation>();
@@ -121,5 +120,13 @@ public class SkeletalAnimationController extends GameComponent
     }
     public SkeletalAnimation getCurrentAnimation() {
         return animations.get(currentAnim);
+    }
+    
+    @Override
+    public SkeletalAnimationController cpy() {
+        SkeletalAnimationController out=new SkeletalAnimationController();
+        for(SkeletalAnimation anim : animations)
+            out.animations.add(anim.cpy());
+        return out;
     }
 }

@@ -35,7 +35,7 @@ public class TextRenderer extends Renderable implements GameComponent.Copiable {
         this.color=color;
     }
     public TextRenderer(String text,Color color) {
-        this(GameServices.getFonts().getValueAt(0),text,color);
+        this(GameServices.getFonts().getValueAt(1),text,color);
     }
     public TextRenderer(String text) {
         this(text,new Color(0,0,0,1));

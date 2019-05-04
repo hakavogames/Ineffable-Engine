@@ -65,6 +65,7 @@ public class Animation extends GameComponent implements GameComponent.Copiable
     public Animation cpy() {
         Animation anim=new Animation(super.name,clip,this.target);
         anim.copyFrom(this);
+        anim.playing=this.playing;
         return anim;
     }
     

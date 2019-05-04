@@ -21,6 +21,7 @@ import com.hakavo.ineffable.core.GameObject;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.utils.*;
 import com.hakavo.ineffable.assets.AssetManager;
@@ -28,21 +29,24 @@ import com.hakavo.ineffable.core.collision.*;
 import com.hakavo.ineffable.core.*;
 import com.hakavo.ineffable.core.physics.*;
 import com.hakavo.ineffable.rendering.*;
+import com.hakavo.ineffable.ui.*;
 import java.util.Comparator;
 
 public class Engine {
     protected Joint level=new Joint();
     protected GameMode gameMode;
     protected Renderer renderer;
-    public OrthographicCamera camera;
+    public final OrthographicCamera camera=new OrthographicCamera();
     private OrthographicCamera ui;
     private void initServices() {
         GameServices.init();
         AssetManager.init();
+        GameServices.camera=this.camera;
     }
     public void init() {
         initServices();
-        camera=new OrthographicCamera();
+        GUI.init(this);
+        camera.setToOrtho(false,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         renderer=new Renderer(this);
         renderer.init();
         ui=new OrthographicCamera();
@@ -53,6 +57,7 @@ public class Engine {
     }
     public void loadGameMode(GameMode gameMode) {
         this.gameMode=gameMode;
+        GUI.mainContainer.clear();
         level.destroy();
         level=createLevel();
         gameMode.init(this);
@@ -75,19 +80,19 @@ public class Engine {
         this.level=level;
     }
     private final Array<Renderable> renderList=new Array<Renderable>();
-    public void render()
-    {
+    public void render() {
         renderList.clear();
         for(GameObject gameObject : level.getAllGameObjects())
             renderList.addAll(gameObject.getComponents(Renderable.class));
         renderList.sort(new Comparator() {
             @Override
             public int compare(Object o1,Object o2) {
-                return ((Renderable)o2).layer-((Renderable)o1).layer;
+                return ((Renderable)o1).layer-((Renderable)o2).layer;
             }
         });
         renderer.render(renderList);
         
+        Matrix4 idt=Pools.obtain(Matrix4.class).idt();
         GameServices.getSpriteBatch().setShader(null);
         GameServices.spriteBatch.begin();
         GameServices.spriteBatch.setProjectionMatrix(ui.combined);
@@ -95,14 +100,18 @@ public class Engine {
             if(renderable.visible)
                 renderable.onGui(ui);
         
+        GameServices.spriteBatch.setTransformMatrix(idt);
+        GameServices.spriteBatch.setColor(1,1,1,1);
         gameMode.renderGui(ui);
+        GUI.render(this.ui);
         if(GameServices.spriteBatch.isDrawing())
             GameServices.spriteBatch.end();
+        Pools.free(idt);
     }
-    public void update(float delta)
-    {
+    public void update(float delta) {
         level.update(delta);
         gameMode.update(delta);
+        GUI.update(delta);
         camera.update();
         GameServices.getSpriteBatch().setProjectionMatrix(camera.combined);
     }
