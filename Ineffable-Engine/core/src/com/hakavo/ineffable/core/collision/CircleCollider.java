@@ -8,6 +8,7 @@ import com.hakavo.ineffable.gameobjects.Map;
 public class CircleCollider extends Collider {
     public Transform transform;
     private Vector2 position;
+    private BoxCollider test=new BoxCollider();
     private float transformedRadius;
     public float x,y,radius;
     
@@ -87,9 +88,12 @@ public class CircleCollider extends Collider {
     }
     @Override
     public boolean collides(Collider collider) {
+        test.setBounds(this.x-this.radius,this.y-this.radius,radius*2,radius*2);
+        test.update(0);
         if(collider instanceof BoxCollider)
         {
             BoxCollider box=(BoxCollider)collider;
+            if(!test.collides(box))return false;
             float deltaX=position.x-Math.max(box.getTransformedX(),Math.min(position.x,box.getTransformedX()+box.getTransformedWidth()));
             float deltaY=position.y-Math.max(box.getTransformedY(),Math.min(position.y,box.getTransformedY()+box.getTransformedHeight()));
             return (deltaX*deltaX+deltaY*deltaY)<(transformedRadius*transformedRadius);
@@ -97,6 +101,7 @@ public class CircleCollider extends Collider {
         else if(collider instanceof CircleCollider)
         {
             CircleCollider circle=(CircleCollider)collider;
+            if(!test.collides(circle.test))return false;
             float dist=Vector2.dst(this.getTransformedX(),this.getTransformedY(),circle.getTransformedX(),circle.getTransformedY());
             return dist<(this.getTransformedRadius()+circle.getTransformedRadius());
         }
@@ -111,7 +116,6 @@ public class CircleCollider extends Collider {
         
         return false;
     }
-    
     @Override
     public String toString() {
         return "["+position.x+","+position.y+","+transformedRadius+"]";

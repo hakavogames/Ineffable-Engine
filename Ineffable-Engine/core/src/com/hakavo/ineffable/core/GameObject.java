@@ -32,6 +32,7 @@ public class GameObject implements MessageListener
         this.addComponents(gameComponents);
     }
     public GameObject(String name) {
+        this();
         this.name=name;
     }
     public GameObject() {

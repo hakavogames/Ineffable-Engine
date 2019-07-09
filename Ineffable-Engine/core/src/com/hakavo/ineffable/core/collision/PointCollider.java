@@ -9,7 +9,7 @@ import com.hakavo.ineffable.gameobjects.Map;
 
 public class PointCollider extends Collider {
     public Transform transform;
-    private Vector2 position=new Vector2();
+    private final Vector2 position=new Vector2();
     public float x,y;
     
     public PointCollider() {
@@ -28,6 +28,7 @@ public class PointCollider extends Collider {
     public float getTransformedY() {
         return position.y;
     }
+    @Override
     public float getVolume() {
         return 1f;
     }
@@ -48,6 +49,31 @@ public class PointCollider extends Collider {
     }
     @Override
     public Vector2 getNormal(Collider collider,Vector2 out) {
+        if(collider instanceof BoxCollider) {
+            BoxCollider coll=(BoxCollider)collider;
+            float d=Float.MAX_VALUE,t=0;
+            t=(coll.getTransformedY()+coll.getTransformedHeight())-position.y;
+            if(t>=0&&t<d) {
+                d=t;
+                out.set(0,-d);
+            }
+            t=position.y-coll.getTransformedY();
+            if(t>=0&&t<d) {
+                d=t;
+                out.set(0,d);
+            }
+            t=(coll.getTransformedX()+coll.getTransformedWidth())-position.x;
+            if(t>=0&&t<d) {
+                d=t;
+                out.set(-d,0);
+            }
+            t=position.x-coll.getTransformedX();
+            if(t>=0&&t<d) {
+                d=t;
+                out.set(d,0);
+            }
+            return out;
+        }
         return out.set(0,0);
     }
     @Override

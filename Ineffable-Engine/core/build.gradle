@@ -9,3 +9,8 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 eclipse.project {
     name = appName + "-core"
 }
+
+dependencies {
+    compile files('build/libs/json.jar')
+    compile files('build/libs/jimpulse.jar')
+}

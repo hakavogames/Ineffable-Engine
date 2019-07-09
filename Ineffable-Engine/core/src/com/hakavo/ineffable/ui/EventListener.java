@@ -23,6 +23,8 @@ public abstract class EventListener {
     }
     public void onMouseDragged(int screenX,int screenY) {
     }
+    public void onScroll(int amount) {
+    }
     public void onFocus() {
     }
     public void onFocusLost() {

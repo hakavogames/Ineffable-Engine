@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.*;
 import com.hakavo.ineffable.*;
 import com.hakavo.ineffable.core.*;
 
-public abstract class RenderPass {
+public abstract class RenderPass implements Disposable {
     protected FrameBuffer frameBuffer;
     public abstract void init(Engine engine);
     public abstract void begin();
@@ -22,5 +22,11 @@ public abstract class RenderPass {
         return frameBuffer;
     }
     public void bind(ShaderProgram shader) {
+    }
+    
+    @Override
+    public void dispose() {
+        if(frameBuffer!=null)
+            frameBuffer.dispose();
     }
 }

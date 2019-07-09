@@ -19,9 +19,12 @@ public class Window extends Container {
         this.movable=movable;
         this.closeable=closeable;
         this.alignToCenter=alignToCenter;
-        super.add(new TitleBar(title,4,closeable));
         super.style.setBorder(2,0.15f,0.15f,0.15f,1);
-        super.style.background.set(0.85f,0.85f,0.85f,1);
+        super.style.background.set(0,0,0,0.5f);
+        super.style.blur=false;
+        TitleBar titleBar=new TitleBar(title,4,closeable);
+        super.add(titleBar);
+        titleBar.onUpdate(0);
     }
     
     @Override
@@ -36,13 +39,20 @@ public class Window extends Container {
         return closeable;
     }
     
+    public void setToFitSize(float width,float height) {
+        bounds.setSize(width,height+super.get(TitleBar.class).bounds.height);
+    }
+    public void setToFitSize(Bounds bounds) {
+        setToFitSize(bounds.width,bounds.height);
+    }
+    
     private static class TitleBar extends Container {
         private Label title;
         private ImageButton closeButton;
         public float padding=0;
         public TitleBar(String text,float padding,boolean closeable) {
             this.padding=padding;
-            title=new Label(text,"opensans-bold");
+            title=new Label(text);
             title.style.foreground.set(0.9f,0.9f,0.9f,1);
             title.bounds.setPosition(padding,padding);
             super.style.blur=false;
@@ -90,7 +100,7 @@ public class Window extends Container {
             Bounds parentBounds=super.getParent().bounds;
             super.bounds.set(0,parentBounds.height-title.bounds.height-padding*2-2,parentBounds.width,title.bounds.height+padding*2+2);
             closeButton.getImage().bounds.setSize(bounds.height-closeButton.padding*2-2,bounds.height-closeButton.padding*2-2);
-            closeButton.bounds.setPosition(bounds.width-bounds.height-2,2);
+            closeButton.bounds.setPosition(bounds.width-bounds.height,0);
         }
         
         private static class CloseButtonListener extends EventListener {

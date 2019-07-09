@@ -19,38 +19,41 @@ import com.hakavo.ineffable.core.Transform;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.*;
+import com.hakavo.ineffable.core.Joint;
 import com.hakavo.ineffable.core.Sprite2D;
+import com.hakavo.ineffable.utils.TimerManager;
 import javax.script.*;
 import java.util.Random;
 
 public class GameServices {
     protected static SpriteBatch spriteBatch;
     protected static ShapeRenderer shapeRenderer;
-    protected static ShaderProgram defaultShader;
     protected static ArrayMap<String,BitmapFont> fonts;
     protected static OrthographicCamera camera;
     private static long startTime;
     
     public static final FileHandle scriptUtilsPath=Gdx.files.internal("scripts/utils/on_script_load.js");
+    public static TimerManager timerManager;
     
-    public static void init()
-    {
+    public static void init() {
         MathUtils.random=new Random();
         spriteBatch=new SpriteBatch();
         shapeRenderer=new ShapeRenderer();
         startTime=TimeUtils.millis();
         
         fonts=new ArrayMap<String,BitmapFont>();
-        fonts.put("pixeltype",createFont(Gdx.files.internal("fonts/pixeltype.ttf"),32));
+        fonts.put("pixeltype",createFont(Gdx.files.internal("fonts/pixeltype2.ttf"),32));
+        fonts.put("adlinnaka",createFont(Gdx.files.internal("fonts/adlinnaka.ttf"),144));
         fonts.put("opensans",createFont(Gdx.files.internal("fonts/opensans-regular.ttf"),18));
         fonts.put("opensans-bold",createFont(Gdx.files.internal("fonts/opensans-bold.ttf"),18));
-        fonts.getValueAt(1).getData().markupEnabled=true;
-        fonts.getValueAt(2).getData().markupEnabled=true;
+        fonts.getValueAt(0).getRegion().getTexture().setFilter(TextureFilter.Nearest,TextureFilter.Nearest);
+        fonts.getValueAt(0).getData().markupEnabled=true;
         
         initPools();
     }
@@ -107,9 +110,6 @@ public class GameServices {
     }
     public static SpriteBatch getSpriteBatch() {
         return spriteBatch;
-    }
-    public static ShaderProgram getDefaultShader() {
-        return defaultShader;
     }
     public static ShapeRenderer getShapeRenderer() {
         return shapeRenderer;

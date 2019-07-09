@@ -38,10 +38,12 @@ public class Bounds {
         return this;
     }
     public Bounds positive() {
-        width+=Math.min(0,x);
-        height+=Math.min(0,y);
+        //width+=Math.min(0,x);
+        //height+=Math.min(0,y);
         x=Math.max(x,0);
         y=Math.max(y,0);
+        //width=Math.max(width,0);
+        //height=Math.max(height,0);
         return this;
     }
     

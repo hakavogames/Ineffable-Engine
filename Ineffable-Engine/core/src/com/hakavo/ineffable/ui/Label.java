@@ -6,6 +6,7 @@ import com.hakavo.ineffable.*;
 
 public class Label extends Container {
     public static String defaultFont="opensans";
+    public boolean autoSize=true;
     private static GlyphLayout glyphLayout;
     private BitmapFont font;
     private String text="";
@@ -15,6 +16,8 @@ public class Label extends Container {
         if(glyphLayout==null)glyphLayout=new GlyphLayout();
         super.focusable=false;
         super.style=new Style(new Color(1,1,1,1),new Color(0,0,0,0),false);
+        this.font=GameServices.getFonts().get(defaultFont);
+        bounds.height=getLineHeight();
     }
     public Label(String text,String fontName) {
         this();
@@ -24,15 +27,11 @@ public class Label extends Container {
     public Label(String text,BitmapFont font) {
         this(text);
         this.font=font;
+        bounds.height=getLineHeight();
     }
     public Label(String text) {
         this();
-        this.font=GameServices.getFonts().get(defaultFont);
         setText(text);
-    }
-    
-    @Override
-    public void onUpdate(float delta) {
     }
     @Override
     public void onRender(OrthographicCamera camera,SpriteBatch sb) {
@@ -49,19 +48,31 @@ public class Label extends Container {
     
     public Label setText(String text) {
         this.text=text;
-        glyphLayout.setText(font,text);
-        float lineHeight=font.getAscent()+font.getXHeight();
-        float height=lineHeight;
-        for(int i=0;i<text.length();i++)
-            if(text.charAt(i)=='\n')
-                height+=font.getLineHeight()+lineHeight;
-        super.bounds.setSize(glyphLayout.width,height);
+        if(autoSize) {
+            float width=getTextWidth(text);
+            float lineHeight=getLineHeight();
+            float height=lineHeight;
+            for(int i=0;i<text.length();i++)
+                if(text.charAt(i)=='\n')
+                    height+=font.getLineHeight()*scale+lineHeight;
+            super.bounds.setSize(width,height);
+        }
         return this;
+    }
+    public float getTextWidth(String text) {
+        glyphLayout.setText(font,text);
+        return glyphLayout.width*scale;
+    }
+    public float getLineHeight() {
+        return (font.getAscent()+font.getCapHeight()+font.getXHeight()+font.getDescent())*scale;
     }
     public Label setScale(float scale) {
         bounds.setSize(bounds.width/this.scale*scale,bounds.height/this.scale*scale);
         this.scale=scale;
         return this;
+    }
+    public BitmapFont getFont() {
+        return font;
     }
     public String getText() {
         return text;

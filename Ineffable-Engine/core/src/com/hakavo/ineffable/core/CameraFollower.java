@@ -7,7 +7,7 @@ import com.hakavo.ineffable.core.*;
 public class CameraFollower extends GameComponent {
     public float smoothness;
     protected Transform transform;
-    private Vector3 position=new Vector3();
+    private final Vector3 position=new Vector3();
     private Vector2 foo=new Vector2();
     
     public CameraFollower() {

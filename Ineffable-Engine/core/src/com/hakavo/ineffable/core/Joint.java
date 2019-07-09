@@ -23,9 +23,10 @@ public class Joint extends GameObject
     public Array<GameObject> gameObjects=new Array<GameObject>();
     
     public Joint() {
+        super();
     }
     public Joint(String name) {
-        super.name=name;
+        super(name);
     }
     
     public <T extends GameObject> T getGameObject(Class type)
@@ -53,7 +54,7 @@ public class Joint extends GameObject
     {
         Array<T> array=new Array<T>();
         for(int i=0;i<gameObjects.size;i++)
-            if(gameObjects.get(i).getClass().isAssignableFrom(type))
+            if(type.isAssignableFrom(gameObjects.get(i).getClass()))
                 array.add((T)gameObjects.get(i));
         return array;
     }
@@ -111,11 +112,6 @@ public class Joint extends GameObject
         gameObjects.add(toAdd);
         toAdd.parent=this;
         toAdd.start();
-    }
-    public final void addGameObjects(GameObject... gameObjects)
-    {
-        for(GameObject gameObject : gameObjects)
-            addGameObject(gameObject);
     }
     
     @Override

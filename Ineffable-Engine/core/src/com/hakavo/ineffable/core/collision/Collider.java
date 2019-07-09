@@ -22,31 +22,35 @@ public abstract class Collider extends GameComponent implements GameComponent.Co
         collisionState=collides(collider);
         if(!active||!collider.active)collisionState=false;
         
-        if(collisionAdapter!=null&&matchTags(collider))
-        {
+        if(matchTags(collider)) {
             if(!objectsHit.contains(collider,true)&&collisionState==true) {
                 objectsHit.add(collider);
-                this.collisionAdapter.onCollisionEnter(collider);
+                if(collisionAdapter!=null)
+                    this.collisionAdapter.onCollisionEnter(collider);
             }
-            else if(objectsHit.contains(collider,true)&&collisionState==true)
+            else if(objectsHit.contains(collider,true)&&collisionState==true&&collisionAdapter!=null)
                 this.collisionAdapter.onCollision(collider);
             else if(objectsHit.contains(collider,true)&&collisionState==false) {
                 objectsHit.removeValue(collider,true);
-                this.collisionAdapter.onCollisionExit(collider);
+                if(collisionAdapter!=null)
+                    this.collisionAdapter.onCollisionExit(collider);
             }
         }
     }
     public Array<Collider> cast(Vector2 direction,float step,int samples) {
         return new Array<Collider>();
     }
+    public Array<Collider> getOverlappedObjects() {
+        return objectsHit;
+    }
     public boolean matchTags(Collider collider) {
         for(int tag : ignoreTags)
             if(collider.tags.contains(tag,true))
                 return false;
         for(int tag : tags)
-            if(collider.tags.contains(tag,true))
-                return true;
-        return false;
+            if(collider.ignoreTags.contains(tag,true))
+                return false;
+        return true;
     }
     public void setCollisionAdapter(CollisionAdapter collisionAdapter) {
         this.collisionAdapter=collisionAdapter;

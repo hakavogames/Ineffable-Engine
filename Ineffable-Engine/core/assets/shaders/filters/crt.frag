@@ -37,19 +37,19 @@ void main()
 {
 	vec2 uv=barrelDistortion(scanDistort(v_texCoords),bDistortion);
 	vec2 barrel=barrelDistortion(v_texCoords,bDistortion);
-	
+
 	vec3 color=texture(u_texture,uv).rgb;
-	
+
 	//color=chromaticAberration();
 	color.r = texture(u_texture,fract(vec2(uv.x+offset,uv.y))).r;
 	color.g = texture(u_texture,fract(vec2(uv.x+0.000,uv.y))).g;
 	color.b = texture(u_texture,fract(vec2(uv.x-offset,uv.y))).b;
-	
-	color=clamp(color*0.5+0.5*color*color*1.2,0.0,1.0);
+
+	//color=clamp(color*0.5+0.5*color*color*1.2,0.0,1.0);
 	color*=0.9+0.1*sin(10.0*u_time-uv.y*1000.0);
 	color*=0.97+0.03*sin(110.0*u_time);
-	
+
 	if(barrel.x-offset<0||barrel.x+offset>1||barrel.y<0||barrel.y>1)color*=0;
-	
+
 	gl_FragColor=vec4(color,1.0);
 }

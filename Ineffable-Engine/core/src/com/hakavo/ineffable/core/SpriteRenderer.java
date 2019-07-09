@@ -83,7 +83,7 @@ public class SpriteRenderer extends Renderable implements GameComponent.Copiable
                 float aspectRatio=(float)(sprite.textureRegion.getRegionWidth())/sprite.textureRegion.getRegionHeight();
                 mat.scale(size/sprite.textureRegion.getRegionWidth()*aspectRatio,size/sprite.textureRegion.getRegionHeight());
             }
-            mat.translate(-sprite.textureRegion.getRegionWidth()/2,-sprite.textureRegion.getRegionHeight()/2);
+            mat.translate(-sprite.textureRegion.getRegionWidth()/2f,-sprite.textureRegion.getRegionHeight()/2f);
             
             Matrix4 foo=Pools.obtain(Matrix4.class).set(mat);
             
@@ -96,6 +96,10 @@ public class SpriteRenderer extends Renderable implements GameComponent.Copiable
             Pools.free(foo);
         }
     }
+    @Override
     public void onGui(OrthographicCamera gui) {
+    }
+    public void setScaleToUnit(boolean scaleToUnit) {
+        this.scaleToUnit=scaleToUnit;
     }
 }

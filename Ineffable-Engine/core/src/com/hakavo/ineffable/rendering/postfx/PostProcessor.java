@@ -1,87 +1,90 @@
 package com.hakavo.ineffable.rendering.postfx;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.GL30;
+import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.*;
-import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.*;
-import com.hakavo.ineffable.*;
-import com.hakavo.ineffable.rendering.*;
+import com.hakavo.ineffable.rendering.postfx.filters.Copy;
+import com.hakavo.ineffable.rendering.postfx.utils.*;
 
-public class PostProcessor {
-    public Array<Filter> filters;
-    protected Renderer renderer;
-    public FrameBuffer buf1,buf2;
-    protected int currentBuffer=1;
+public class PostProcessor implements Disposable {
+    protected final PingPongFrameBuffer buffer;
+    public final Array<Effect> effects=new Array<Effect>();
+    private final Array<Effect> active=new Array<Effect>();
+    private final Copy copy=new Copy();
     
-    public PostProcessor(Renderer renderer)
-    {
-        this(renderer,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+    public PostProcessor(int width,int height,Format format) {
+        this(width,height,format,false);
     }
-    public PostProcessor(Renderer renderer,int width,int height)
-    {
-        this.renderer=renderer;
-        buf1=new FrameBuffer(Format.RGBA8888,width,height,false);
-        buf2=new FrameBuffer(Format.RGBA8888,width,height,false);
-        buf1.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear,Texture.TextureFilter.Linear);
-        buf2.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear,Texture.TextureFilter.Linear);
-        filters=new Array<Filter>();
+    public PostProcessor(int width,int height,Format format,boolean hasDepth) {
+        ShaderProgram.pedantic=false;
+        buffer=new PingPongFrameBuffer(width,height,format,hasDepth);
     }
-    public void render(boolean toRenderBuffer,Texture... inputs)
-    {
+    
+    public PostProcessor render(FrameBuffer input,FrameBuffer output) {
+        boolean depth=Gdx.gl.glIsEnabled(GL30.GL_DEPTH_TEST);
+        boolean blend=Gdx.gl.glIsEnabled(GL30.GL_BLEND);
         Gdx.gl.glDisable(GL30.GL_DEPTH_TEST);
         Gdx.gl.glDisable(GL30.GL_BLEND);
-        currentBuffer=1;
-        for(int i=0;i<filters.size;i++)
-        {
-            if(!filters.get(i).active)continue;
-            filters.get(i).resolution.set(buf1.getWidth(),buf1.getHeight());
-            if(currentBuffer==1)
-            {
-                currentBuffer=2;
-                if(i==0) {
-                    filters.get(i).bind(inputs);
-                }
-                else if(filters.get(i).samplers.size>0)
-                    filters.get(i).samplers.get(0).texture=buf2.getColorBufferTexture();
-                if(i==filters.size-1&&toRenderBuffer==true)filters.get(i).render(null);
-                else filters.get(i).render(buf1);
-            }
-            else
-            {
-                currentBuffer=1;
-                if(filters.get(i).samplers.size>0)
-                    filters.get(i).samplers.get(0).texture=buf1.getColorBufferTexture();
-                if(i==filters.size-1&&toRenderBuffer==true)filters.get(i).render(null);
-                else filters.get(i).render(buf2);
-            }
+        
+        Array<Effect> items=active;
+        getActiveEffects(items);
+        if(items.size==0)return this;
+        
+        buffer.reset();
+        for(int i=0;i<items.size;i++) {
+            items.get(i).init(getWidth(),getHeight(),getFormat());
+            FrameBuffer src,dest;
+            if(i==0)src=input;
+            else src=buffer.getLast();
+            if(i==items.size-1&&output!=null)dest=output;
+            else dest=buffer.getCurrent();
+            active.get(i).render(src,dest);
+            buffer.next();
         }
+        
+        if(depth)Gdx.gl.glEnable(GL30.GL_DEPTH_TEST);
+        if(blend)Gdx.gl.glEnable(GL30.GL_BLEND);
+        
+        return this;
     }
-    public void render(boolean toRenderBuffer) {
-        Texture[] array=new Texture[filters.get(0).samplers.size];
-        for(int i=0;i<filters.get(0).samplers.size;i++)
-            array[i]=filters.get(0).samplers.get(i).texture;
-        if(filters.size>0)
-            render(toRenderBuffer,array);
+    
+    public void toRenderBuffer() {
+        ShaderProgram shader=copy.getShader();
+        Mesh quad=FullScreenQuad.getQuad();
+        shader.begin();
+        buffer.getLast().getColorBufferTexture().bind(0);
+        Gdx.gl.glActiveTexture(GL30.GL_TEXTURE0);
+        quad.render(shader,GL30.GL_TRIANGLES);
+        shader.end();
     }
-    public FrameBuffer getLastFBO()
-    {
-        if(filters.size>1)
-        {
-            if(currentBuffer==2)return buf1;
-            else return buf2;
-        }
-        return buf1;
+    
+    private Array<Effect> getActiveEffects(Array<Effect> out) {
+        out.clear();
+        for(Effect effect : effects)
+            if(effect.enabled)
+                out.add(effect);
+        return out;
     }
-    public void addFilter(Filter filter) {
-        filter.renderer=this.renderer;
-        filters.add(filter);
+    
+    public int getWidth() {
+        return buffer.texture1.getWidth();
     }
-    public void addFilters(Filter... filters) {
-        for(Filter filter : filters)
-            addFilter(filter);
+    public int getHeight() {
+        return buffer.texture1.getHeight();
     }
-    public int getWidth() {return buf1.getWidth();}
-    public int getHeight() {return buf1.getHeight();}
+    public Format getFormat() {
+        return buffer.texture1.getColorBufferTexture().getTextureData().getFormat();
+    }
+    public PingPongFrameBuffer getBuffer() {
+        return buffer;
+    }
+    
+    @Override
+    public void dispose() {
+        buffer.dispose();
+        for(Effect effect : effects)
+            effect.dispose();
+    }
 }

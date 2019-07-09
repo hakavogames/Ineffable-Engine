@@ -1,0 +1,29 @@
+{
+	"assetBundle": [
+		{
+			"format":"texture",
+			"path":"parallax-mountain-bg.png",
+			"name":"mountain-bg"
+		},
+		{
+			"format":"texture",
+			"path":"parallax-mountain-mountain-far.png",
+			"name":"mountain-far"
+		},
+		{
+			"format":"texture",
+			"path":"parallax-mountain-mountains.png",
+			"name":"mountain-mountains"
+		},
+		{
+			"format":"texture",
+			"path":"parallax-mountain-trees.png",
+			"name":"mountain-trees"
+		},
+		{
+			"format":"texture",
+			"path":"parallax-mountain-foreground-trees.png",
+			"name":"mountain-foreground-trees"
+		},
+	]
+}

@@ -19,6 +19,7 @@ package com.hakavo.ineffable.core;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Pools;
 import com.hakavo.ineffable.GameServices;
@@ -27,6 +28,7 @@ public class TextRenderer extends Renderable implements GameComponent.Copiable {
     public BitmapFont font;
     public Color color;
     public String text;
+    private static GlyphLayout glyph;
     private Transform transform;
     
     public TextRenderer(BitmapFont font,String text,Color color) {
@@ -35,7 +37,7 @@ public class TextRenderer extends Renderable implements GameComponent.Copiable {
         this.color=color;
     }
     public TextRenderer(String text,Color color) {
-        this(GameServices.getFonts().getValueAt(1),text,color);
+        this(GameServices.getFonts().getValueAt(0),text,color);
     }
     public TextRenderer(String text) {
         this(text,new Color(0,0,0,1));
@@ -46,6 +48,7 @@ public class TextRenderer extends Renderable implements GameComponent.Copiable {
     
     @Override
     public void start() {
+        if(glyph==null)glyph=new GlyphLayout();
         transform=this.getGameObject().getComponent(Transform.class);
     }
     @Override
@@ -55,8 +58,9 @@ public class TextRenderer extends Renderable implements GameComponent.Copiable {
         foo.set(bar);
         
         GameServices.getSpriteBatch().setTransformMatrix(foo);
+        glyph.setText(font,text);
         font.setColor(color);
-        font.draw(GameServices.getSpriteBatch(),text,0,0);
+        font.draw(GameServices.getSpriteBatch(),text,-glyph.width/2,-glyph.height/2);
         
         Pools.free(foo);
         Pools.free(bar);

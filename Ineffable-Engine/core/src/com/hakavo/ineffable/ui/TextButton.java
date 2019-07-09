@@ -8,9 +8,12 @@ public class TextButton extends Button {
         this(text,8);
     }
     public TextButton(String text,float padding) {
+        this(text,Label.defaultFont,padding);
+    }
+    public TextButton(String text,String font,float padding) {
         super();
         this.padding=padding;
-        label=new Label(text);
+        label=new Label(text,font);
         super.add(label);
         updateLabel();
         super.addEventListener(new EventListener() {
@@ -21,6 +24,7 @@ public class TextButton extends Button {
                 updateLabel();
             }
         });
+        onUpdate(0);
     }
     public Label getLabel() {
         return label;

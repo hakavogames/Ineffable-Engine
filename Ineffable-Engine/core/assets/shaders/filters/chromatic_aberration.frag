@@ -18,10 +18,10 @@ float reci_num_iter_f=1.0/float(u_samples);
 void main()
 {
 	vec3 color=texture2D(u_texture,v_texCoords).rgb;
-	vec2 uv=v_texCoords/1.05+0.025;
+	vec2 uv=v_texCoords;//1.05+0.025;
 
 	vec4 sumcol=vec4(0.0);
-	vec4 sumw=vec4(0.0);	
+	vec4 sumw=vec4(0.0);
 	for (int i=0;i<u_samples;++i)
 	{
 		float t=float(i)*reci_num_iter_f;

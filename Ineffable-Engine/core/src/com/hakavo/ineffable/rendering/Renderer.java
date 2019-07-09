@@ -1,21 +1,16 @@
 package com.hakavo.ineffable.rendering;
 
-import com.hakavo.ineffable.core.Transform;
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.graphics.glutils.*;
-import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.*;
 import com.hakavo.ineffable.*;
 import com.hakavo.ineffable.core.*;
 import com.hakavo.ineffable.rendering.postfx.*;
+import com.hakavo.ineffable.rendering.postfx.utils.FullScreenQuad;
 
-public class Renderer {
+public class Renderer implements Disposable {
     public Array<RenderPass> renderPasses=new Array<RenderPass>();
-    public PostProcessor postfx=new PostProcessor(this);
+    public PostProcessor postfx;
     protected Engine engine;
     
     private DefaultPass defaultPass;
@@ -24,6 +19,7 @@ public class Renderer {
         this.engine=engine;
     }
     public void init() {
+        postfx=new PostProcessor(Gdx.graphics.getWidth(),Gdx.graphics.getHeight(),Pixmap.Format.RGB888);
         defaultPass=new DefaultPass();
         renderPasses.add(defaultPass);
         //postfx.addFilter(new ChromaticAberration());
@@ -38,8 +34,8 @@ public class Renderer {
                 renderPass.render(renderable);
             renderPass.end();
         }
-        postfx.render(true,defaultPass.getFrameBuffer().getTextureAttachments().get(0));
-        Gdx.gl.glActiveTexture(GL30.GL_TEXTURE0);
+        postfx.render(defaultPass.getFrameBuffer(),null).toRenderBuffer();
+        //Gdx.gl.glActiveTexture(GL30.GL_TEXTURE0);
     }
     public void addRenderPasses(RenderPass... passes) {
         for (RenderPass pass : passes)
@@ -47,5 +43,12 @@ public class Renderer {
     }
     public final Engine getEngine() {
         return engine;
+    }
+    
+    @Override
+    public final void dispose() {
+        renderPasses.clear();
+        postfx.dispose();
+        for(RenderPass pass : renderPasses)pass.dispose();
     }
 }

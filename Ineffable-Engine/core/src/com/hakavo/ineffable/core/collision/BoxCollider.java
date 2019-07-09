@@ -96,6 +96,9 @@ public class BoxCollider extends Collider {
             }
             return out;
         }
+        else if(collider instanceof PointCollider) {
+            return collider.getNormal(this,out);
+        }
         return out.set(0,0);
     }
     @Override

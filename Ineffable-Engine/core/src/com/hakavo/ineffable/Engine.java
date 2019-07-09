@@ -30,18 +30,21 @@ import com.hakavo.ineffable.core.*;
 import com.hakavo.ineffable.core.physics.*;
 import com.hakavo.ineffable.rendering.*;
 import com.hakavo.ineffable.ui.*;
+import com.hakavo.ineffable.utils.TimerManager;
 import java.util.Comparator;
 
 public class Engine {
     protected Joint level=new Joint();
     protected GameMode gameMode;
     protected Renderer renderer;
+    
     public final OrthographicCamera camera=new OrthographicCamera();
     private OrthographicCamera ui;
     private void initServices() {
         GameServices.init();
         AssetManager.init();
         GameServices.camera=this.camera;
+        GameServices.timerManager=new TimerManager(this);
     }
     public void init() {
         initServices();
@@ -57,7 +60,11 @@ public class Engine {
     }
     public void loadGameMode(GameMode gameMode) {
         this.gameMode=gameMode;
-        GUI.mainContainer.clear();
+        GameServices.timerManager.clearTimers();
+        
+        renderer.dispose();
+        renderer.init();
+        GUI.reset();
         level.destroy();
         level=createLevel();
         gameMode.init(this);
@@ -109,6 +116,7 @@ public class Engine {
         Pools.free(idt);
     }
     public void update(float delta) {
+        GameServices.timerManager.update(delta);
         level.update(delta);
         gameMode.update(delta);
         GUI.update(delta);
@@ -126,10 +134,10 @@ public class Engine {
             cursor=new PointCollider();
             cursor.active=false;
             cursor.name="mouse-pointer";
-            cursor.tags.set(0,-1);
+            cursor.tags.clear();
             
             level=(Joint)this.getGameObject();
-            level.addComponent(cursor);
+            //level.addComponent(cursor);
             gameObjects=new Array<GameObject>();
         }
         @Override
